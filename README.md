@@ -81,11 +81,10 @@ an object of all the content needed by the html function (this is still a work i
 
 When writing your layouts, you can use blocks by importing the template type dict you need from the module "templates" and calling it like so:
 
-'''
-from templates import blocks
-
-blocks["nav_bar"](data.nav_bar)
-'''
+  ```python
+  from templates import blocks
+  blocks["nav_bar"](data.nav_bar)
+  ```
 
 ## Future Plans/Goals
 
