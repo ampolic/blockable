@@ -70,8 +70,8 @@ to work like so:
 
 When creating a website, there should be three primary folders: Blocks, Layouts, and Assets. The assets folder should contain
 a folder for each type of asset you want site wide (css, js, fonts, images, etc.). The blocks and layouts folder mimic each other
-in that each folder should contain a folder for each block/layout you want to create. These folders should then contain an index.py and
-__init__.py file. See the example file structure below:
+in that each folder should contain a folder for each block/layout you want to create. These folders should then contain an index.py and a 
+stylesheet.css and javascript.js if necessary. See the example file structure below:
 
 TODO File Structure Image
 

@@ -31,38 +31,33 @@ def import_templates(template_type):
     # Create list of all folders in template folder
     templates = os.listdir(template_type)
 
-    # Remove pychach from list
-    if "__pycache__" in templates:
-        templates.remove("__pycache__")
-
     # Define dict
     template_dict = {}
-
-    # Add template type path
-    sys.path.insert(1, template_type)
 
     # Import each template
     for template in templates:
         """
-        This for loop works by calling the python import function
-        and importing each file based on its name given in the templates list.
-        The loop then adds each modules html function to a dict accessible by its name.
-        Finally the loop removes the template module from the modules dict so that
-        templates of the same name but different type may be loaded
+        This loop works by inserting the path to each template folder in the list
+        of templates, importing the html function from the index file, adding
+        the html function to a dictionary, and then finally removing the
+        module from the directory so others of the same name can be imported
+        and remove the template path so others can take its place.
         """
-
-        # Import template module (ie: "from homepage import index as template_module" [except it only imports the html function])
-        template_module = __import__(template + ".index", globals(), locals(), "html")
         
-        # Add HTML function to dict
-        template_dict[template] = template_module.html
+        # Add template path
+        sys.path.insert(1, template_type + "/" + template)
+
+        # Import html function from the index file in the newly added path
+        from index import html
+        
+        # Add HTML function to dictionary
+        template_dict[template] = html
 
         # Remove template from module directory
-        sys.modules.pop(template)
-        sys.modules.pop(template + ".index")
+        sys.modules.pop("index")
 
-    # Remove template type path
-    sys.path.remove(template_type)
+        # Remove template path
+        sys.path.remove(template_type + "/" + template)
 
     # Return dict
     return template_dict
