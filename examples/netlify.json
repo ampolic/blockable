@@ -1,0 +1,20 @@
+{
+	"backend": {
+		"name": "github",
+		"repo": "mygithub/GitRepo",
+		"branch": "main",
+		"site_domain": "cms.netlify.com",
+		"api_root": "https://api.github.com"
+	},
+	"media_folder": "images/uploads",
+	"collections": [
+		{
+			"label": "Pages",
+			"name": "pages",
+			"files": [
+				"layouts/homepage",
+				"layouts/about"
+			]
+		}
+	]
+}

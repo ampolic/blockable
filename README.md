@@ -75,9 +75,8 @@ stylesheet.css and javascript.js if necessary. See the example file structure be
 
 TODO File Structure Image
 
-Index.py should define two functions. The first function should be called html() and should accept one variable which will contain all
-the content for the html and should return the html to be displayed. The second function should be called fields() and it should return
-an object of all the content needed by the html function (this is still a work in progress).
+Index.py should define one main function called html() it and should accept one variable which will contain all the content
+for the html and should return the html to be displayed.
 
 When writing your layouts, you can use blocks by importing the template type dict you need from the module "templates" and calling it like so:
 
@@ -86,8 +85,27 @@ When writing your layouts, you can use blocks by importing the template type dic
   blocks["nav_bar"](data.nav_bar)
   ```
 
+# Netlify
+
+Currently Blockable only supports Netlify as a CMS although support for more CMSs is planned in the future. In order to use Netlify,
+developers should create a netlify.json file (or make a copy of the one in the example folder) and fill it out like a normal
+config.yml for Netlify (See Netlify documentation for information). The only difference is listing the files for collections, simply
+put the location of every layout you would like to include such as 'layouts/homepage' or 'layouts/about'.
+
+Next place a netlify.json file in every layout folder you would like to use and put all the infomation that would normally go under
+'files' in the config.yml for a standard Netlify deployment.
+
+Finally, run
+
+  ```
+  python netlify.py
+  ```
+which will generate a working config.yml for Netlify to use.
+
+
+
 ## Future Plans/Goals
 
 - Write more complete documentation
-- Write support for fields function
+- Parse layout json files for block configs
 - Include more compile parameters
