@@ -1,0 +1,20 @@
+{
+	"label": "Homepage",
+	"name": "homepage",
+	"file": "site/content/homepage.json",
+	"field_files": [
+		"blocks/about"
+	],
+	"fields": [
+		{
+			"label": "Title",
+			"name": "title",
+			"widget": "string"
+		},
+		{ 
+			"label": "Call to action",
+			"name": "cta",
+			"widget": "markdown"
+		}
+	]
+}

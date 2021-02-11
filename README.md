@@ -88,9 +88,9 @@ When writing your layouts, you can use blocks by importing the template type dic
 # Netlify
 
 Currently Blockable only supports Netlify as a CMS although support for more CMSs is planned in the future. In order to use Netlify,
-developers should create a netlify.json file (or make a copy of the one in the example folder) and fill it out like a normal
-config.yml for Netlify (See Netlify documentation for information). The only difference is listing the files for collections, simply
-put the location of every layout you would like to include such as 'layouts/homepage' or 'layouts/about'.
+developers should create a netlify.json file and fill it out like a normal config.yml for Netlify (See Netlify documentation for information).
+The only difference is listing the files for collections, simply put the location of every layout you would like to include such as 'layouts/homepage' 
+or 'layouts/about' with the json key "template_files". See the starter_template example in the examples folder.
 
 Next place a netlify.json file in every layout folder you would like to use and put all the infomation that would normally go under
 'files' in the config.yml for a standard Netlify deployment.
