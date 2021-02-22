@@ -83,7 +83,7 @@ with the data you'd like to give that block
 
   ```python
   from blockable import blocks
-  blocks("nav_var", data["nav_bar"])
+  blocks("nav_bar", data["nav_bar"])
   ```
 
 # Netlify
