@@ -78,11 +78,12 @@ TODO File Structure Image
 Index.py should define one main function called html() it and should accept one variable which will contain all the content
 for the html and should return the html to be displayed.
 
-When writing your layouts, you can use blocks by importing the template type dict you need from the module "templates" and calling it like so:
+When writing your layouts, you can use blocks by importing the block function from the module "blockable" and then pass it the block you want along
+with the data you'd like to give that block
 
   ```python
-  from templates import blocks
-  blocks["nav_bar"](data.nav_bar)
+  from blockable import blocks
+  blocks("nav_var", data["nav_bar"])
   ```
 
 # Netlify
