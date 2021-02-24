@@ -8,6 +8,7 @@ import json
 CONFIG_FILE_NAME = 'netlify.json'
 TEMPLATE_FILE_NAME = 'netlify.json'
 FIELD_FILE_NAME = 'netlify.json'
+IMPORT_PREFIX = 'import_'
 
 
 def main():
@@ -32,8 +33,8 @@ def parse_config(netlify_config):
     # Loop though each collection and parse template_files
     for collection in collections:
 
-        # Parse collection
-        collection = parse_collection(collection, "template_files", "files")
+        # Parse collection for imports
+        parse_for_imports(collection)
 
         # Add collection to config
         netlify_config["collections"].append(collection)
@@ -41,62 +42,62 @@ def parse_config(netlify_config):
     return netlify_config
 
 
-def parse_collection(collection, template_dir_key, template_final_key):
+def parse_for_imports(data):
+    """
+    This function looks for a key in a given data set that begins
+    with the IMPORT_PREFIX and then proceeds to recursively parse and
+    attach all the json files to the var data
+    """
 
-    # check if data_dict contains a dir key and get dir list if so
-    if template_dir_key in collection:
-        template_dir_list = collection[template_dir_key]
-        collection.pop(template_dir_key)
-    else:
-        return collection
-
-    # Check if final key is in data_dict and create if not
-    if template_final_key not in collection:
-        collection[template_final_key] = list()
-
-    for template_dir in template_dir_list:
-
-        # Load template
-        template = parse_json(template_dir + '/' + TEMPLATE_FILE_NAME)
-
-        # Parse template
-        template = parse_template(template, "field_files", "fields")
-
-        # Add template to collection
-        collection[template_final_key].append(template)
-
-    # Return collection
-    return collection
-
-
-
-def parse_template(template, field_dir_key, field_final_key):
-
-    # Check if template has field files
-    if field_dir_key in template:
-        # Get list of dirs then remove dict
-        field_dirs = template[field_dir_key]
-        template.pop(field_dir_key)
-    else:
-        # Add template to collection
-        return template
+    # Get import key
+    import_key = get_key_by_prefix(data, IMPORT_PREFIX)
     
-    # Check if fields list exists and create it if it doesn't
-    if field_final_key not in template:
-        template[field_final_key] = list()
+    # Base case (no import key was found)
+    if not import_key:
+        return
+
+    # Create final key by removing import prefix
+    final_key = import_key[len(IMPORT_PREFIX):]
+
+    # Get list of dirs from data and remove it from data
+    file_dirs = data.pop(import_key)
+
+    # Check if final key is in data and create if not
+    if final_key not in data:
+        data[final_key] = list()
+
+    # Loop though each file dir
+    for file_dir in file_dirs:
+
+        # Load json
+        imported_data = parse_json(file_dir + '/' + TEMPLATE_FILE_NAME)
+
+        # Parse data for imports
+        parse_for_imports(imported_data)
+
+        # Check data of imported data
+        if type(imported_data) == list:
+            # Add as list
+            data[final_key] += imported_data
+        else:
+            # Add as dictionary
+            data[final_key].append(imported_data)
+
+
+def get_key_by_prefix(dictionary, prefix):
+    """
+    This function checks if any of a dictionaries keys
+    contains a given prefix and returns the key if so
+    """
+
+    # Loop though each key and check if it contains prefix
+    for key in dictionary:
+        if prefix in key:
+            return key
+
+    # Return empty string if nothing is found
+    return ""
     
-    # Loop though field file dirs and to fields list
-    for field_dir in field_dirs:
-    
-        # Load field
-        fields = parse_json(field_dir + '/' + FIELD_FILE_NAME)
-
-        # Add field to template
-        template[field_final_key] += fields
-        
-    return template
-
-
 
 def parse_json(file_dir):
     """
