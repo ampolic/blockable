@@ -10,7 +10,6 @@ TEMPLATE_FILE_NAME = 'netlify.json'
 FIELD_FILE_NAME = 'netlify.json'
 IMPORT_PREFIX = 'import_'
 
-
 def main():
     # Import main netlify config
     netlify_config = parse_json(CONFIG_FILE_NAME)
@@ -21,7 +20,6 @@ def main():
     # Save final netlify config file
     with open('config.yml', 'w') as netlify_yml_config:
         json.dump(netlify_config, netlify_yml_config, indent=4)
-
 
 
 def parse_config(netlify_config):
@@ -59,29 +57,63 @@ def parse_for_imports(data):
     # Create final key by removing import prefix
     final_key = import_key[len(IMPORT_PREFIX):]
 
-    # Get list of dirs from data and remove it from data
-    file_dirs = data.pop(import_key)
+    # Get list of imports
+    data_imports = data.pop(import_key)
 
     # Check if final key is in data and create if not
     if final_key not in data:
         data[final_key] = list()
 
+    # Import data based on type
+    if final_key == "fields":
+        import_as_field(data, data_imports, final_key)
+    else:
+        import_as_general(data, data_imports, final_key)
+
+
+def import_as_general(data, data_imports, final_key):
+    """
+    This is a helper function for the function
+    parse_for_imports that handles the final step
+    in a generic way
+    """
     # Loop though each file dir
-    for file_dir in file_dirs:
-
+    for data_import in data_imports:
+    
         # Load json
-        imported_data = parse_json(file_dir + '/' + TEMPLATE_FILE_NAME)
-
+        imported_data = parse_json(data_import + '/' + TEMPLATE_FILE_NAME)
+    
         # Parse data for imports
         parse_for_imports(imported_data)
-
+   
         # Check data of imported data
-        if type(imported_data) == list:
-            # Add as list
-            data[final_key] += imported_data
-        else:
-            # Add as dictionary
-            data[final_key].append(imported_data)
+        data[final_key].append(imported_data)
+    
+
+def import_as_field(data, data_imports, final_key):
+    """
+    This is a helper function for the function
+    parse_for_imports that handles the final step
+    by creating an object for the imported fields
+    """
+    # Loop though each data import
+    for data_import in data_imports:
+    
+        # Get import info
+        file_dir = data_import[0]
+        object_name = data_import[1]
+    
+        # Load json
+        imported_data = parse_json(file_dir + '/' + TEMPLATE_FILE_NAME)
+    
+        # Parse data for imports
+        parse_for_imports(imported_data)
+    
+        # Create object
+        fields_object = {"label": object_name, "name": object_name, "widget": "object", "collapsed": True, "fields": imported_data}
+    
+        # Add object to data file
+        data[final_key].append(fields_object)
 
 
 def get_key_by_prefix(dictionary, prefix):
