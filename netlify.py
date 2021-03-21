@@ -6,16 +6,15 @@
 import json
 
 CONFIG_FILE_NAME = 'netlify.json'
-TEMPLATE_FILE_NAME = 'netlify.json'
-FIELD_FILE_NAME = 'netlify.json'
-IMPORT_PREFIX = 'import_'
+FIELDS_FILE_NAME = 'fields.json'
+IMPORT_KEY = "import"
 
 def main():
-    # Import main netlify config
+    # Import main Netlify config
     netlify_config = parse_json(CONFIG_FILE_NAME)
 
     # Parse Netlify config
-    netlify_config = parse_config(netlify_config)
+    parse_config(netlify_config)
     
     # Save final netlify config file
     with open('config.yml', 'w') as netlify_yml_config:
@@ -23,113 +22,60 @@ def main():
 
 
 def parse_config(netlify_config):
-
     # Get list of collections and then reset list
     collections = netlify_config["collections"]
     netlify_config["collections"] = list()
 
     # Loop though each collection and parse template_files
     for collection in collections:
-
-        # Parse collection for imports
-        parse_for_imports(collection)
+        # Parse for imports
+        parse_for_imports(collection, "files")
 
         # Add collection to config
         netlify_config["collections"].append(collection)
-   
-    return netlify_config
 
 
-def parse_for_imports(data):
+def parse_for_imports(data, import_type):
     """
-    This function looks for a key in a given data set that begins
-    with the IMPORT_PREFIX and then proceeds to recursively parse and
-    attach all the json files to the var data
+    This function takes in a dictionary and checks if anything needs
+    importing than imports it with the given type. It then calls itself
+    on the newly imported data and imports it with the type 'field'
     """
 
-    # Get import key
-    import_key = get_key_by_prefix(data, IMPORT_PREFIX)
-    
-    # Base case (no import key was found)
-    if not import_key:
+    # Check if data has imports
+    if IMPORT_KEY not in data:
         return
 
-    # Create final key by removing import prefix
-    final_key = import_key[len(IMPORT_PREFIX):]
-
-    # Get list of imports
-    data_imports = data.pop(import_key)
+    # Get import data
+    data_imports = data.pop(IMPORT_KEY)
 
     # Check if final key is in data and create if not
-    if final_key not in data:
-        data[final_key] = list()
+    if import_type not in data:
+        data[import_type] = list()
 
-    # Import data based on type
-    if final_key == "fields":
-        import_as_field(data, data_imports, final_key)
-    else:
-        import_as_general(data, data_imports, final_key)
-
-
-def import_as_general(data, data_imports, final_key):
-    """
-    This is a helper function for the function
-    parse_for_imports that handles the final step
-    in a generic way
-    """
-    # Loop though each file dir
-    for data_import in data_imports:
-    
-        # Load json
-        imported_data = parse_json(data_import + '/' + TEMPLATE_FILE_NAME)
-    
-        # Parse data for imports
-        parse_for_imports(imported_data)
-   
-        # Check data of imported data
-        data[final_key].append(imported_data)
-    
-
-def import_as_field(data, data_imports, final_key):
-    """
-    This is a helper function for the function
-    parse_for_imports that handles the final step
-    by creating an object for the imported fields
-    """
     # Loop though each data import
     for data_import in data_imports:
-    
         # Get import info
-        file_dir = data_import[0]
-        object_name = data_import[1]
+        file_dir = data_import["location"]
+        object_name = data_import["name"]
+        object_label = data_import["label"]
     
         # Load json
-        imported_data = parse_json(file_dir + '/' + TEMPLATE_FILE_NAME)
+        imported_data = parse_json(file_dir + '/' + FIELDS_FILE_NAME)
     
-        # Parse data for imports
-        parse_for_imports(imported_data)
+        # Parse for imports
+        parse_for_imports(imported_data, "fields")
     
         # Create object
-        fields_object = {"label": object_name, "name": object_name, "widget": "object", "collapsed": True, "fields": imported_data}
-    
+        if import_type == "files":
+            fields_object = {"label": object_label, "name": object_name, "file": "site/content/" + object_name + ".json", "fields": imported_data["fields"]}
+
+        if import_type == "fields":
+            fields_object = {"label": object_label, "name": object_name, "widget": "object", "collapsed": True, "fields": imported_data["fields"]}
+
         # Add object to data file
-        data[final_key].append(fields_object)
+        data[import_type].append(fields_object)
 
-
-def get_key_by_prefix(dictionary, prefix):
-    """
-    This function checks if any of a dictionaries keys
-    contains a given prefix and returns the key if so
-    """
-
-    # Loop though each key and check if it contains prefix
-    for key in dictionary:
-        if prefix in key:
-            return key
-
-    # Return empty string if nothing is found
-    return ""
-    
 
 def parse_json(file_dir):
     """
