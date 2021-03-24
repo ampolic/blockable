@@ -28,54 +28,60 @@ def parse_config(netlify_config):
 
     # Loop though each collection and parse template_files
     for collection in collections:
-        # Parse for imports
-        parse_for_imports(collection, "files")
+        if "files" in collection:
+            for layout in collection["files"]:
+                import_layout(layout, "file")
+        else:
+            import_layout(collection, "folder")
 
         # Add collection to config
         netlify_config["collections"].append(collection)
 
 
-def parse_for_imports(data, import_type):
+def import_layout(layout, layout_type):
     """
-    This function takes in a dictionary and checks if anything needs
-    importing than imports it with the given type. It then calls itself
-    on the newly imported data and imports it with the type 'field'
+    This function imports a layout by importing the fields and
+    removing/adding some extra keys to the dictionary
     """
+    # Add layout file/folder
+    layout[layout_type] = "site/content/" + layout["name"] + ".json"
 
+    # Import fields
+    import_fields(layout)
+
+    # Remove extra field keys
+    layout.pop("widget")
+    layout.pop("collapsed")
+
+
+def import_fields(data):
+    """
+    This function recursively import fields
+    """
     # Check if data has imports
     if IMPORT_KEY not in data:
         return
 
-    # Get import data
-    data_imports = data.pop(IMPORT_KEY)
+    # Get import info
+    file_dir = data.pop(IMPORT_KEY)
+    name = data["name"]
+    label = data["label"]
 
     # Check if final key is in data and create if not
-    if import_type not in data:
-        data[import_type] = list()
-
-    # Loop though each data import
-    for data_import in data_imports:
-        # Get import info
-        file_dir = data_import["location"]
-        object_name = data_import["name"]
-        object_label = data_import["label"]
+    if "fields" not in data:
+        data["fields"] = list()
     
-        # Load json
-        imported_data = parse_json(file_dir + '/' + FIELDS_FILE_NAME)
-    
-        # Parse for imports
-        parse_for_imports(imported_data, "fields")
-    
-        # Create object
-        if import_type == "files":
-            fields_object = {"label": object_label, "name": object_name, "file": "site/content/" + object_name + ".json", "fields": imported_data["fields"]}
-
-        if import_type == "fields":
-            fields_object = {"label": object_label, "name": object_name, "widget": "object", "collapsed": True, "fields": imported_data["fields"]}
-
-        # Add object to data file
-        data[import_type].append(fields_object)
-
+    # Load json
+    fields = parse_json(file_dir + '/' + FIELDS_FILE_NAME)
+   
+    # Parse for imports
+    for field in fields:
+        import_fields(field)
+   
+    # Turn into field object
+    data["widget"] = "object"
+    data["collapsed"] = True
+    data["fields"] = fields
 
 def parse_json(file_dir):
     """

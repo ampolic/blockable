@@ -90,17 +90,15 @@ with the data you'd like to give that block
 
 Currently Blockable only supports Netlify as a CMS although support for more CMSs is planned in the future. In order to use Netlify,
 developers should create a netlify.json file and fill it out like a normal config.yml for Netlify (See Netlify documentation for information).
-The only difference is that instead of defining the each item in a collection, developers should add a "import" dictionary instead
-of just adding "files". This dictionary should contain the following keys:
+The only difference is that when defining the each item in a collection, developers should add a "import" dictionary into each file instead of
+of just adding fields. This means each file dictionary should contain the following keys:
 
-location (the location of the file you'd like to import such as "layouts/homepage")  
+import (the location of the file you'd like to import such as "layouts/homepage")  
 name (the unique name of this import)  
 label (the non unique label of this import)  
 
-You may also add layouts manually by adding stuff to the "files" key or they may do a combination of the two  
-
-Next place a fields.json file in every layout folder you would like to use and either use the import dictionary to import blocks in that code
-or add a fields dictionary to use like standard Netlify deployment.
+Next place a fields.json file in every layout folder and block folder that contains every netlify field you want to add. To import blocks
+into layouts, use the same format as for importing layouts (import, name, and label)
 
 Finally, run
 
