@@ -58,15 +58,13 @@ def get_data_dict():
     to the directory of the layout it uses
     """
 
-    # Dict where key is data path and value is layout
+    # Initialize dict
     data_dict = {}
 
-    # Get config 
+    # Populate dict
     netlify_config = parse_json("netlify.json")
-
-    # Get page list from file collections
     for collection in netlify_config["collections"]:
-        if "files" in collection:
+        if "files" in collection: # Collection is layout-based
             for page in collection["files"]:
 
                 # Get import info
@@ -74,27 +72,20 @@ def get_data_dict():
                 break_point = import_name.find("/")
 
                 # Ensure import is layout
-                if import_name[:break_point] != "layouts":
-                    break
+                if import_name[:break_point] == "layouts":
+                    data_dict[collection["name"] + "/" + page["name"] + ".json"] = import_name[break_point+1:]
 
-                # Add to dict
-                data_dict[collection["name"] + "/" + page["name"] + ".json"] = import_name[break_point+1:]
-        else:
- 
+        else: # Collection is data-based
+
            # Get import info
            import_name = collection["import"]
            break_point = import_name.find("/")
 
            # Ensure import is layout
-           if import_name[:break_point] != "layouts":
-               break
-           
-           # Add to dict
-           data_dict[collection["name"]] = import_name[break_point+1:]
+           if import_name[:break_point] == "layouts":
+               data_dict[collection["name"]] = import_name[break_point+1:]
 
     return data_dict
-
-
 
 
 def prepare_desination():
@@ -110,105 +101,60 @@ def prepare_desination():
     os.mkdir(DESINATION + "/css/blocks/")
     os.mkdir(DESINATION + "/js/blocks/")
 
-
 def move_assets():
-
     # Move everything in assets folder
     asset_list = os.listdir("assets")
     for asset in asset_list:
         os.system("cp -r assets/" + asset + " " + DESINATION)
 
-    # Move css and javascript in layouts folder
-    layouts_list = os.listdir("layouts")
-
-    for layout in layouts_list:
-        if os.path.isfile("layouts/" + layout + "/" + CSS_FILE):
-            os.system('cp ' + "layouts/" + layout + "/" + CSS_FILE + " " + DESINATION + "/css/layouts/" + layout + ".css")
-
-        if os.path.isfile("layouts/" + layout + "/" + JS_FILE):
-            os.system('cp ' + "layouts/" + layout + "/" + JS_FILE + " " + DESINATION + "/js/layouts/" + layout + ".js")
-
-
-    # Move css and javascript in blocks folder
-    blocks_list = os.listdir("blocks")
-
-    for layout in blocks_list:
-        if os.path.isfile("blocks/" + layout + "/" + CSS_FILE):
-            os.system('cp ' + "blocks/" + layout + "/" + CSS_FILE + " " + DESINATION + "/css/blocks/" + layout + ".css")
-
-        if os.path.isfile("blocks/" + layout + "/" + JS_FILE):
-            os.system('cp ' + "blocks/" + layout + "/" + JS_FILE + " " + DESINATION + "/js/blocks/" + layout + ".js")
-
-
 
 def save(html, page_name):
-    """
-    This function will save the layout given a file name
-    and html
-    """
-
-    # Save file
+    # Save html with given name
     with open(DESINATION + "/" + page_name + '.html', 'w') as page:
         page.write(html);
 
 
 def layouts(layout, data):
-    """
-    This function accepts a layout name and a data json then calls the html
-    function of the given layout, passing it the data parameter. The function
-    returns whatever html the layout function returns
-    """
-
-    # Import modules
-    import sys
-
-    # Add template path
-    sys.path.insert(1, "layouts/" + layout)
-    
-    # Import html function from the index file
-    from index import html as layout_function
-
-    # Remove template from module directory
-    sys.modules.pop("index")
-    
-    # Remove template path
-    sys.path.remove("layouts/" + layout)
-
-    # Generate html using imported function
-    html = layout_function(data)
-    
-    # Return html
-    return html
+    # Wrapper function for executing a template
+    return execute_template("layouts/" + layout, data)
 
 
 def blocks(block, data):
+    # Wrapper function for executing a template
+    return execute_template("blocks/" + block, data)
+
+def execute_template(template_path, data):
     """
-    This function accepts a block name and a data json then calls the html
-    function of the given block, passing it the data parameter. The function
-    returns whatever html the block function returns
+    This function accepts a template path and a data json then calls the html
+    function of the given template, passing it the data parameter and returns
+    the templates output
     """
 
     # Import modules
     import sys
 
     # Add template path
-    sys.path.insert(1, "blocks/" + block)
+    sys.path.insert(1, template_path)
     
-    # Import html function from the index file
-    from index import html as block_function
-    
-    # Generate html using imported function
-    html = block_function(data)
-    
-    # Remove template from module directory
+    # Import html function then clean up sys path
+    from index import html as template_function
     sys.modules.pop("index")
+    sys.path.remove(template_path)
+  
+    # Get html
+    html = template_function(data)
     
-    # Remove template path
-    sys.path.remove("blocks/" + block)
+    # Move CSS
+    if os.path.isfile(template_path + "/" + CSS_FILE):
+        os.system('cp ' + template_path + "/" + CSS_FILE + " " + DESINATION + "/css/" + template_path + ".css")
+        html = "<stylesheet ref=link>" + "\n" + html
 
-    # Return html
+    # Move JS
+    if os.path.isfile(template_path + "/" + JS_FILE):
+        os.system('cp ' + template_path + "/" + JS_FILE + " " + DESINATION + "/js/" + template_path + ".js")
+        html = html + "\n" + "<script ref=link>"
+
     return html
-
 
 
 # Boilerplate
