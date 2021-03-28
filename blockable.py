@@ -3,34 +3,153 @@
 # currently print out all the layouts html return.
 
 
-def main():
-    # Import modules
-    import os
+DESINATION = "public_html"
+CSS_FILE = "stylesheet.css"
+JS_FILE = "javascript.js"
 
+
+# Import modules
+from netlify import parse_json
+import os
+
+
+def main():
     # Get list of layouts
     layouts_list = os.listdir("layouts")
 
-    # Get data
-    data = []
+    # Get data dict
+    data_dict = get_data_dict()
 
-    # Compile and save layouts
+    # Make all folders
+    prepare_desination()
+
+    # Get collection
+    collection_list = os.listdir("data")
+    
+    # Loop though data
+    for collection in collection_list:
+        data_file_list = os.listdir("data/" + collection)
+        for data_file in data_file_list:
+            
+            # Get path
+            path = collection + "/" + data_file
+            
+            # Get layout
+            if path in data_dict:
+                layout = data_dict[path]
+            elif collection in data_dict:
+                layout = data_dict[collection]
+            else:
+                break
+
+            # Get data and html then save
+            data = parse_json("data/" + path)
+            html = layouts(layout, data)
+            save(html, data_file[:-5])
+
+
+    # Move assets
+    move_assets()
+
+
+def get_data_dict():
+    """
+    This function creates a returns a mapping from the directory of a json data file
+    to the directory of the layout it uses
+    """
+
+    # Dict where key is data path and value is layout
+    data_dict = {}
+
+    # Get config 
+    netlify_config = parse_json("netlify.json")
+
+    # Get page list from file collections
+    for collection in netlify_config["collections"]:
+        if "files" in collection:
+            for page in collection["files"]:
+
+                # Get import info
+                import_name = page["import"]
+                break_point = import_name.find("/")
+
+                # Ensure import is layout
+                if import_name[:break_point] != "layouts":
+                    break
+
+                # Add to dict
+                data_dict[collection["name"] + "/" + page["name"] + ".json"] = import_name[break_point+1:]
+        else:
+ 
+           # Get import info
+           import_name = collection["import"]
+           break_point = import_name.find("/")
+
+           # Ensure import is layout
+           if import_name[:break_point] != "layouts":
+               break
+           
+           # Add to dict
+           data_dict[collection["name"]] = import_name[break_point+1:]
+
+    return data_dict
+
+
+
+
+def prepare_desination():
+    # Delete
+    os.system("rm -fdr " + DESINATION)
+
+    # Create directories
+    os.mkdir(DESINATION)
+    os.mkdir(DESINATION + "/css/")
+    os.mkdir(DESINATION + "/js/")
+    os.mkdir(DESINATION + "/css/layouts/")
+    os.mkdir(DESINATION + "/js/layouts/")
+    os.mkdir(DESINATION + "/css/blocks/")
+    os.mkdir(DESINATION + "/js/blocks/")
+
+
+def move_assets():
+
+    # Move everything in assets folder
+    asset_list = os.listdir("assets")
+    for asset in asset_list:
+        os.system("cp -r assets/" + asset + " " + DESINATION)
+
+    # Move css and javascript in layouts folder
+    layouts_list = os.listdir("layouts")
+
     for layout in layouts_list:
-        html = layouts(layout, data)
-        save(layout, html)
+        if os.path.isfile("layouts/" + layout + "/" + CSS_FILE):
+            os.system('cp ' + "layouts/" + layout + "/" + CSS_FILE + " " + DESINATION + "/css/layouts/" + layout + ".css")
+
+        if os.path.isfile("layouts/" + layout + "/" + JS_FILE):
+            os.system('cp ' + "layouts/" + layout + "/" + JS_FILE + " " + DESINATION + "/js/layouts/" + layout + ".js")
+
+
+    # Move css and javascript in blocks folder
+    blocks_list = os.listdir("blocks")
+
+    for layout in blocks_list:
+        if os.path.isfile("blocks/" + layout + "/" + CSS_FILE):
+            os.system('cp ' + "blocks/" + layout + "/" + CSS_FILE + " " + DESINATION + "/css/blocks/" + layout + ".css")
+
+        if os.path.isfile("blocks/" + layout + "/" + JS_FILE):
+            os.system('cp ' + "blocks/" + layout + "/" + JS_FILE + " " + DESINATION + "/js/blocks/" + layout + ".js")
 
 
 
-
-def save(layout, html):
+def save(html, page_name):
     """
     This function will save the layout given a file name
     and html
     """
 
-    # Temp, just print out layout name then html
-    print(layout)
-    print(html)
-
+    # Save file
+    with open(DESINATION + "/" + page_name + '.html', 'w') as page:
+        page.write(html);
 
 
 def layouts(layout, data):

@@ -97,6 +97,9 @@ import (the location of the file you'd like to import such as "layouts/homepage"
 name (the unique name of this import)  
 label (the non unique label of this import)  
 
+Folder collections can also be created by simply adding the above keys in the list of collections instead of in the "files" key of a collection you
+define yourself.   
+
 Next place a fields.json file in every layout folder and block folder that contains every netlify field you want to add. To import blocks
 into layouts, use the same format as for importing layouts (import, name, and label)
 

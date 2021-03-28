@@ -15,7 +15,7 @@ def main():
 
     # Parse Netlify config
     parse_config(netlify_config)
-    
+  
     # Save final netlify config file
     with open('config.yml', 'w') as netlify_yml_config:
         json.dump(netlify_config, netlify_yml_config, indent=4)
@@ -30,21 +30,21 @@ def parse_config(netlify_config):
     for collection in collections:
         if "files" in collection:
             for layout in collection["files"]:
-                import_layout(layout, "file")
+                import_layout(layout, collection["name"], "file")
         else:
-            import_layout(collection, "folder")
+            import_layout(collection, collection["name"], "folder")
 
         # Add collection to config
         netlify_config["collections"].append(collection)
 
 
-def import_layout(layout, layout_type):
+def import_layout(layout, collection_name, layout_type):
     """
     This function imports a layout by importing the fields and
     removing/adding some extra keys to the dictionary
     """
     # Add layout file/folder
-    layout[layout_type] = "site/content/" + layout["name"] + ".json"
+    layout[layout_type] = "data/" + collection_name + "/" + layout["name"] + ".json"
 
     # Import fields
     import_fields(layout)
