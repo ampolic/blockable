@@ -174,8 +174,7 @@ def layouts(layout, data):
     # Remove template path
     sys.path.remove("layouts/" + layout)
 
-    
-    # Add html function to dictionary
+    # Generate html using imported function
     html = layout_function(data)
     
     # Return html
@@ -198,7 +197,7 @@ def blocks(block, data):
     # Import html function from the index file
     from index import html as block_function
     
-    # Add html function to dictionary
+    # Generate html using imported function
     html = block_function(data)
     
     # Remove template from module directory
