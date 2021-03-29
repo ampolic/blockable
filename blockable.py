@@ -143,12 +143,12 @@ def execute_template(template_path, data):
     # Move CSS
     if os.path.isfile(template_path + "/" + CSS_FILE):
         os.system('cp ' + template_path + "/" + CSS_FILE + " " + DESINATION + "/css/" + template_path + ".css")
-        html = "<stylesheet ref=link>" + "\n" + html
+        html = ("<stylesheet rel='/css/" + template_path + ".css'>") + ("\n" + html)
 
     # Move JS
     if os.path.isfile(template_path + "/" + JS_FILE):
         os.system('cp ' + template_path + "/" + JS_FILE + " " + DESINATION + "/js/" + template_path + ".js")
-        html = html + "\n" + "<script ref=link>"
+        html = (html + "\n") + ("<script rel='/js/" + template_path + ".js'>")
 
     return html
 

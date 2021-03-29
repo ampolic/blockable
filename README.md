@@ -75,38 +75,42 @@ to work like so:
 
 When creating a website, there should be three primary folders: Blocks, Layouts, and Assets. The assets folder should contain
 a folder for each type of asset you want site wide (css, js, fonts, images, etc.). The blocks and layouts folder mimic each other
-in that each folder should contain a folder for each block/layout you want to create. These folders should then contain an index.py and a 
-stylesheet.css and javascript.js if necessary. See the example file structure below:
+in that each folder should contain a folder for each block/layout you want to create. These folders should then contain an index.py, a 
+stylesheet.css and javascript.js if necessary, and a fields.json (more on this later).   
 
-TODO File Structure Image
+Index.py should define one main function called html(). This function should accept one variable (which will contain a dictionary of all the data
+requested in fields.json), and it should return a string of the html for that template. When writing your templates, you should make use of the
+'layouts' and 'blocks' functions by importing them form the module 'blockable'. Both these functions accept two parameters:   
 
-Index.py should define one main function called html() it and should accept one variable which will contain all the content
-for the html and should return the html to be displayed.
+1. The name of the template   
+2. The data to pass to the template  
 
-When writing your layouts, you can use blocks by importing the block function from the module "blockable" and then pass it the block you want along
-with the data you'd like to give that block
+Although the main purpose of this is to add blocks to layouts like so:
 
   ```python
   from blockable import blocks
   blocks("nav_bar", data["nav_bar"])
   ```
 
+These functions may be used in any combination (I.e. add blocks to other blocks or even add layouts to blocks), so long as you avoid recursive calls.
+
 # Netlify
 
 Currently Blockable only supports Netlify as a CMS although support for more CMSs is planned in the future. In order to use Netlify,
 developers should create a netlify.json file and fill it out like a normal config.yml for Netlify (See Netlify documentation for information).
-The only difference is that when defining the each item in a collection, developers should add a "import" dictionary into each file instead of
-of just adding fields. This means each file dictionary should contain the following keys:
+The only difference is that when it comes to defining collections.   
+
+File-based collections (or layout-based collections) are accomplished by defining the collection like normal, except for the "files" section
+where developers should add the following dictionary into each file instead of just adding fields:
 
 import (the location of the file you'd like to import such as "layouts/homepage")  
 name (the unique name of this import)  
 label (the non unique label of this import)  
 
-Folder collections can also be created by simply adding the above keys in the list of collections instead of in the "files" key of a collection you
-define yourself.   
+Folder-based collections (or data-based collections) are created in a similar way except you place the above directory inside the list of collections.   
 
-Next place a fields.json file in every layout folder and block folder that contains every netlify field you want to add. To import blocks
-into layouts, use the same format as for importing layouts (import, name, and label)
+Next place a fields.json file in every template folder. This file should contain a list of each Netlify field for that template and, if necessary, the above
+import dictionary for any extra templates used.   
 
 Finally, run
 
