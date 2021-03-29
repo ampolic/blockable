@@ -39,8 +39,7 @@ things up, below is a list of the terms and how we will be using them.
 
 ### Page
 
-A page is an HTML file. This means that every unique URL will lead to a unique page (assuming no redirects or frames). How a page looks is
-determined by the __layout__ it uses.
+A page is simply a genetic term for an HTML file. How a page looks is determined by the __layout__ it uses.
 
 ### Layout
 
@@ -56,11 +55,17 @@ with it which specifies the layout to be used and the content to be displayed.
 
 Blocks are snippets of HTML that can be used when creating page layouts.
 
+### Collection
+
+Collections are ways of organizing pages. There are two types of collections, __data-based collections__ and __layout-based collections__.
+Data-based collections are collections which have multiple pages all using the same layout but with different data. Layout-based collections
+are collections where each page has a unique layout and data file associated with it. I.e. data-based collections are useful for blogs, shops, etc
+while layout-based collection are useful for unique pages such as a homepage, about us, contact, etc.
+
+
 ### Templates
 
-We use template as a catch all term to represent files capable of generating HTML when given a data file. Every type of template has a dictionaries associated
-with it which is created by the file templates.py. These dictionaries can be imported when writing template (such as layouts) but be mindful to avoid recursive 
-uses of templates. By default there are two types of templates, layouts and blocks. However more templates can easily be added when needed.
+We use template as a catch all term to represent files capable of generating HTML when given a data file.
 
 
 ## Documentation
