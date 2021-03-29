@@ -1,7 +1,7 @@
 {
 	"backend": {
 		"name": "github",
-		"repo": "mygithub/GitRepo",
+		"repo": "csmoran/Test-2",
 		"branch": "main",
 		"site_domain": "cms.netlify.com",
 		"api_root": "https://api.github.com"
@@ -9,11 +9,36 @@
 	"media_folder": "images/uploads",
 	"collections": [
 		{
+			"label": "Blog",
+			"name": "blog",
+			"import": "layouts/blog"
+		},
+		{
+			"label": "Settings",
+			"name": "settings",
+			"files": [
+				{
+					"label": "Nav Bar",
+					"name": "nav_bar",
+					"import": "blocks/nav_bar"
+				}
+
+			]
+		},
+		{
 			"label": "Pages",
 			"name": "pages",
 			"files": [
-				"layouts/homepage",
-				"layouts/about"
+				{
+					"import": "layouts/homepage",
+					"label": "Homepage",
+					"name": "index"
+				},
+				{
+					"import": "layouts/about",
+					"label": "About",
+					"name": "about"
+				}
 			]
 		}
 	]

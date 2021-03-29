@@ -1,0 +1,7 @@
+[
+	{
+		"label": "Site Color",
+		"name": "site-color",
+		"widget": "string"
+	}
+]

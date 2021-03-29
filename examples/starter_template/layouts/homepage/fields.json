@@ -1,0 +1,18 @@
+[
+	{
+		"label": "Title",
+		"name": "title",
+		"widget": "string"
+	},
+	{ 
+		"label": "Call to action",
+		"name": "cta",
+		"widget": "markdown"
+	},
+	{
+		
+		"import": "blocks/about",
+		"name":"about",
+		"label": "About"
+	}
+]

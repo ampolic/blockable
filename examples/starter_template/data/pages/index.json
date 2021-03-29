@@ -1,0 +1,14 @@
+{
+  "title": "Ampolic",
+  "cta": "Contact us now",
+  "about": {
+    "about": "We make websites",
+    "services": [
+      {
+        "name": "Website",
+        "price": "$20",
+        "photo": "/images/uploads/20200220_112658-1-.jpg"
+      }
+    ]
+  }
+}

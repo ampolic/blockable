@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
+#
 # Blockable.py
-# This file implements all the necessary functions for blockable. Running it, will
-# currently print out all the layouts html return.
+# This file implements all the necessary functions for blockable.
 
 # Import modules and set constants
 import json
@@ -64,15 +65,12 @@ def compile_site():
             html = layouts(layout, data)
             save(html, data_file[:-5])
 
-
     # Move assets
     move_assets()
-
 
 def site_data(path):
     # Function to be imported and allow access to site data
     return parse_json("data/" + path + ".json")
-
 
 def get_data_dict():
     """

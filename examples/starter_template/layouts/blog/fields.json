@@ -1,0 +1,12 @@
+[
+	{
+		"label": "Title",
+		"name": "title",
+		"widget": "string"
+	},
+	{ 
+		"label": "Story",
+		"name": "story",
+		"widget": "string"
+	}
+]
