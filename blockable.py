@@ -52,6 +52,11 @@ def main():
     move_assets()
 
 
+def site_data(path):
+    # Function to be imported and allow access to site data
+    return parse_json("data/" + path + ".json")
+
+
 def get_data_dict():
     """
     This function creates a returns a mapping from the directory of a json data file
@@ -87,19 +92,15 @@ def get_data_dict():
 
     return data_dict
 
-
 def prepare_desination():
-    # Delete
+    # Create new destination folder
     os.system("rm -fdr " + DESINATION)
-
-    # Create directories
     os.mkdir(DESINATION)
-    os.mkdir(DESINATION + "/css/")
-    os.mkdir(DESINATION + "/js/")
-    os.mkdir(DESINATION + "/css/layouts/")
-    os.mkdir(DESINATION + "/js/layouts/")
-    os.mkdir(DESINATION + "/css/blocks/")
-    os.mkdir(DESINATION + "/js/blocks/")
+
+    # Create asset directories
+    for asset in ["css", "js"]:
+        for template in ["", "layouts", "blocks"]:
+            os.mkdir(DESINATION + "/" + asset + "/" + template)
 
 def move_assets():
     # Move everything in assets folder
@@ -107,17 +108,14 @@ def move_assets():
     for asset in asset_list:
         os.system("cp -r assets/" + asset + " " + DESINATION)
 
-
 def save(html, page_name):
     # Save html with given name
     with open(DESINATION + "/" + page_name + '.html', 'w') as page:
         page.write(html);
 
-
 def layouts(layout, data):
     # Wrapper function for executing a template
     return execute_template("layouts/" + layout, data)
-
 
 def blocks(block, data):
     # Wrapper function for executing a template
@@ -130,10 +128,8 @@ def execute_template(template_path, data):
     the templates output
     """
 
-    # Import modules
-    import sys
-
     # Add template path
+    import sys
     sys.path.insert(1, template_path)
     
     # Import html function then clean up sys path
