@@ -9,11 +9,27 @@ JS_FILE = "javascript.js"
 
 
 # Import modules
-from netlify import parse_json
+from netlify import parse_json, create_config
 import os
 
 
 def main():
+
+    import argparse
+    
+    # Set up arguments
+    parser = argparse.ArgumentParser(description='Python based static site generator')
+    parser.add_argument('-N', '--netlify', action="store_true", help='Only compiles the Netlify components')
+    
+    # Parse arguments
+    args = vars(parser.parse_args())
+    if args["netlify"]:
+        create_config()
+    else:
+        compile_site()
+
+
+def compile_site():
     # Get list of layouts
     layouts_list = os.listdir("layouts")
 

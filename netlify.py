@@ -9,7 +9,11 @@ CONFIG_FILE_NAME = 'netlify.json'
 FIELDS_FILE_NAME = 'fields.json'
 IMPORT_KEY = "import"
 
+
 def main():
+    create_config()
+
+def create_config():
     # Import main Netlify config
     netlify_config = parse_json(CONFIG_FILE_NAME)
 

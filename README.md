@@ -115,6 +115,6 @@ import dictionary for any extra templates used.
 Finally, run
 
   ```
-  python netlify.py
+  python blockable.py -N
   ```
 which will generate a working config.yml for Netlify to use.
