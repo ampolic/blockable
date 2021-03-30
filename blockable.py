@@ -14,7 +14,6 @@ DESINATION = "public_html"
 CSS_FILE = "stylesheet.css"
 JS_FILE = "javascript.js"
 
-
 def main():
     # Import arg parse
     import argparse
@@ -30,10 +29,7 @@ def main():
     else:
         compile_site()
 
-
 def compile_site():
-    # Get list of layouts
-    layouts_list = os.listdir("layouts")
 
     # Get data dict
     data_dict = get_data_dict()
@@ -62,7 +58,9 @@ def compile_site():
 
             # Get data and html then save
             data = parse_json("data/" + path)
-            html = layouts(layout, data)
+            template_path = "layouts/" + layout
+            template_function =  get_template_function(template_path)
+            html = execute_template(template_function, template_path, data)
             save(html, data_file[:-5])
 
     # Move assets
@@ -128,15 +126,28 @@ def save(html, page_name):
     with open(DESINATION + "/" + page_name + '.html', 'w') as page:
         page.write(html);
 
-def layouts(layout, data):
-    # Wrapper function for executing a template
-    return execute_template("layouts/" + layout, data)
+def create_template_namespaces():
+    # Create a global namespace for each template type
 
-def blocks(block, data):
-    # Wrapper function for executing a template
-    return execute_template("blocks/" + block, data)
+    # Import
+    import types
+    import functools
 
-def execute_template(template_path, data):
+    # Loop though template types
+    for template_type in ["layouts", "blocks"]:
+        # Create global namespace for template type and get template list
+        globals()[template_type] = types.SimpleNamespace()
+        template_list = os.listdir(template_type)
+
+        # Loop though templates and add functions to namespace
+        for template in template_list:
+            template_path = template_type + "/" + template
+            template_function = get_template_function(template_path)
+            
+            # Bind a partial template function that only accepts data...to the attribute "template" of the namespace
+            setattr(globals()[template_type], template, functools.partial(execute_template, template_function, template_path))
+
+def get_template_function(template_path):
     """
     This function accepts a template path and a data json then calls the html
     function of the given template, passing it the data parameter and returns
@@ -151,10 +162,15 @@ def execute_template(template_path, data):
     from index import html as template_function
     sys.modules.pop("index")
     sys.path.remove(template_path)
-  
-    # Get html
+
+    return template_function
+
+def execute_template(template_function, template_path, data):
+    # Returns html for template and moves css/js
+
+    # Run template
     html = template_function(data)
-    
+
     # Move CSS
     if os.path.isfile(template_path + "/" + CSS_FILE):
         os.system('cp ' + template_path + "/" + CSS_FILE + " " + DESINATION + "/css/" + template_path + ".css")
@@ -178,7 +194,6 @@ def create_config():
     with open('config.yml', 'w') as netlify_yml_config:
         json.dump(netlify_config, netlify_yml_config, indent=4)
 
-
 def parse_config(netlify_config):
     # Get list of collections and then reset list
     collections = netlify_config["collections"]
@@ -195,7 +210,6 @@ def parse_config(netlify_config):
         # Add collection to config
         netlify_config["collections"].append(collection)
 
-
 def import_layout(layout, collection_name, layout_type):
     """
     This function imports a layout by importing the fields and
@@ -210,7 +224,6 @@ def import_layout(layout, collection_name, layout_type):
     # Remove extra field keys
     layout.pop("widget")
     layout.pop("collapsed")
-
 
 def import_fields(data):
     """
@@ -254,3 +267,6 @@ def parse_json(file_dir):
 # Boilerplate
 if __name__ == "__main__":
     main()
+else:
+    create_template_namespaces()
+

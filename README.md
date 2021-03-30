@@ -80,19 +80,16 @@ stylesheet.css and javascript.js if necessary, and a fields.json (more on this l
 
 Index.py should define one main function called html(). This function should accept one variable (which will contain a dictionary of all the data
 requested in fields.json), and it should return a string of the html for that template. When writing your templates, you should make use of the
-'layouts' and 'blocks' functions by importing them form the module 'blockable'. Both these functions accept two parameters:   
-
-1. The name of the template   
-2. The data to pass to the template  
-
-Although the main purpose of this is to add blocks to layouts like so:
+'layouts' and 'blocks' objects by importing them form the module 'blockable'. Both these objects contain an attriube linking to the function of
+their respective template function:   
 
   ```python
   from blockable import blocks
-  blocks("nav_bar", data["nav_bar"])
+  blocks.nav_bar(data["nav_bar"])
   ```
 
-These functions may be used in any combination (I.e. add blocks to other blocks or even add layouts to blocks), so long as you avoid recursive calls.
+Although the main purpose if what's see above (importing blocks into layouts), these functions may be used in any combination (I.e. add blocks 
+to other blocks or even add layouts to blocks), so long as you avoid recursive calls.
 
 # Netlify
 
