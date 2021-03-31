@@ -13,6 +13,20 @@ IMPORT_KEY = "import"
 DESINATION = "public_html"
 CSS_FILE = "stylesheet.css"
 JS_FILE = "javascript.js"
+NETLIFY_INDEX = """
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Content Manager</title>
+    </head>
+    <body>
+        <!-- Include the script that builds the page and powers Netlify CMS -->
+        <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+    </body>
+</html>
+"""
 
 def main():
     # Import arg parse
@@ -109,6 +123,7 @@ def prepare_desination():
     # Create new destination folder
     os.system("rm -fdr " + DESINATION)
     os.mkdir(DESINATION)
+    os.mkdir(DESINATION + "/" + "admin")
 
     # Create asset directories
     for asset in ["css", "js"]:
@@ -174,12 +189,12 @@ def execute_template(template_function, template_path, data):
     # Move CSS
     if os.path.isfile(template_path + "/" + CSS_FILE):
         os.system('cp ' + template_path + "/" + CSS_FILE + " " + DESINATION + "/css/" + template_path + ".css")
-        html = ("<stylesheet rel='/css/" + template_path + ".css'>") + ("\n" + html)
+        html = ("<link rel='stylesheet' href='/css/" + template_path + ".css'>") + ("\n" + html)
 
     # Move JS
     if os.path.isfile(template_path + "/" + JS_FILE):
         os.system('cp ' + template_path + "/" + JS_FILE + " " + DESINATION + "/js/" + template_path + ".js")
-        html = (html + "\n") + ("<script rel='/js/" + template_path + ".js'>")
+        html = (html + "\n") + ("<script src='/js/" + template_path + ".js'></script>")
 
     return html
 
@@ -189,10 +204,19 @@ def create_config():
 
     # Parse Netlify config
     parse_config(netlify_config)
-  
-    # Save final netlify config file
-    with open('config.yml', 'w') as netlify_yml_config:
+ 
+    # Create admin folder
+    if not os.path.isdir(DESINATION):
+        os.mkdir(DESINATION)
+    if not os.path.isdir(DESINATION + "/admin"):
+        os.mkdir(DESINATION + "/admin")
+    
+    # Populate netlify admin folder
+    with open(DESINATION + "/admin/" + 'index.html', 'w') as netlify_index_file:
+        netlify_index_file.write(netlify_index)
+    with open(DESINATION + "/admin/" + 'config.yml', 'w') as netlify_yml_config:
         json.dump(netlify_config, netlify_yml_config, indent=4)
+
 
 def parse_config(netlify_config):
     # Get list of collections and then reset list
