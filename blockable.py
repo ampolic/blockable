@@ -44,7 +44,6 @@ def main():
         compile_site()
 
 def compile_site():
-
     # Get data dict
     data_dict = get_data_dict()
 
@@ -181,22 +180,50 @@ def get_template_function(template_path):
     return template_function
 
 def execute_template(template_function, template_path, data):
-    # Returns html for template and moves css/js
+    # Returns html for template and handles css/js moves and insertions
 
     # Run template
     html = template_function(data)
 
-    # Move CSS
-    if os.path.isfile(template_path + "/" + CSS_FILE):
-        os.system('cp ' + template_path + "/" + CSS_FILE + " " + DESINATION + "/css/" + template_path + ".css")
-        html = ("<link rel='stylesheet' href='/css/" + template_path + ".css'>") + ("\n" + html)
+    # Get list of inline styles and remove from html
+    inline_style_list = get_inline_styles(html)
+    for inline_style in inline_style_list:
+        html = html.replace("<style>" + inline_style + "</style>", "")
 
-    # Move JS
+    # Get current css file
+    css = ""
+    if os.path.isfile(template_path + "/" + CSS_FILE):
+        with open(template_path + "/" + CSS_FILE, "r") as css_file:
+            css += css_file.read()
+    
+    # Add inline style to css
+    while len(inline_style_list) != 0:
+        css += inline_style_list.pop()
+
+    # Save css
+    if css:
+        html = ("<link rel='stylesheet' href='/css/" + template_path + ".css'>") + ("\n" + html)
+        with open(DESINATION + "/css/" + template_path + ".css", "w") as css_file:
+            css_file.write(css)
+
+    # Copy JS
     if os.path.isfile(template_path + "/" + JS_FILE):
         os.system('cp ' + template_path + "/" + JS_FILE + " " + DESINATION + "/js/" + template_path + ".js")
         html = (html + "\n") + ("<script src='/js/" + template_path + ".js'></script>")
 
     return html
+
+def get_inline_styles(html):
+    # Find start and end tags until no more start tags
+    inline_style_list = list()
+    start_point = html.find("<style>")
+    while start_point != -1:
+        end_point = html.find("</style>", start_point)
+        inline_style = html[start_point + len("<style>"):end_point]
+        inline_style_list.append(inline_style)
+        start_point = html.find("<style>", end_point)
+
+    return inline_style_list
 
 def create_config():
     # Import main Netlify config
@@ -213,10 +240,9 @@ def create_config():
     
     # Populate netlify admin folder
     with open(DESINATION + "/admin/" + 'index.html', 'w') as netlify_index_file:
-        netlify_index_file.write(netlify_index)
+        netlify_index_file.write(NETLIFY_INDEX)
     with open(DESINATION + "/admin/" + 'config.yml', 'w') as netlify_yml_config:
         json.dump(netlify_config, netlify_yml_config, indent=4)
-
 
 def parse_config(netlify_config):
     # Get list of collections and then reset list
@@ -250,9 +276,8 @@ def import_layout(layout, collection_name, layout_type):
     layout.pop("collapsed")
 
 def import_fields(data):
-    """
-    This function recursively import fields
-    """
+    # Recursively import fields
+    
     # Check if data has imports
     if IMPORT_KEY not in data:
         return
@@ -279,11 +304,6 @@ def import_fields(data):
     data["fields"] = fields
 
 def parse_json(file_dir):
-    """
-    This function accepts the directory of a json file and returns
-    a parsed version of the json file
-    """
-
     # Open file and return parsed json
     with open(file_dir, 'r') as file:
         return json.load(file)
@@ -293,4 +313,3 @@ if __name__ == "__main__":
     main()
 else:
     create_template_namespaces()
-
