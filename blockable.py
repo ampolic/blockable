@@ -10,7 +10,7 @@ import os
 CONFIG_FILE_NAME = 'netlify.json'
 FIELDS_FILE_NAME = 'fields.json'
 IMPORT_KEY = "import"
-DESINATION = "public_html"
+DESINATION = "tmp"
 CSS_FILE = "stylesheet.css"
 JS_FILE = "javascript.js"
 NETLIFY_INDEX = """
@@ -35,15 +35,45 @@ def main():
     # Set up arguments
     parser = argparse.ArgumentParser(description='Python based static site generator')
     parser.add_argument('-N', '--netlify', action="store_true", help='Only compiles the Netlify components')
-    
+    parser.add_argument('-I', '--input', help='Set path to input folder')
+    parser.add_argument('-O', '--output', help='Set path to output folder')
+   
     # Parse arguments
     args = vars(parser.parse_args())
-    if args["netlify"]:
-        create_config()
+
+    if args["output"]:
+        final_desination = get_absolute_path(args["output"])
     else:
+        final_desination = get_absolute_path("public_html")
+    
+    if args["input"]:
+        os.chdir(args["input"])
+
+    if not args["netlify"]:
         compile_site()
+   
+    create_config()
+   
+    # Move to final destination and clean up
+    if not os.path.isdir(final_desination):
+        os.mkdir(final_desination)
+
+    os.system("cp -r " + DESINATION + "/* " + final_desination + "/")
+    os.system("rm -fdr " + DESINATION)
+
+def get_absolute_path(path):
+    # Remove end /
+    if path[-1] == "/":
+        path = path[:-1]
+
+    # Add pwd
+    if path[0] == "/":
+        return path
+    else:
+        return os.getcwd() + "/" + path
 
 def compile_site():
+
     # Get data dict
     data_dict = get_data_dict()
 
@@ -184,7 +214,7 @@ def execute_template(template_function, template_path, data):
 
     # Run template
     html = template_function(data)
-
+    
     # Get list of inline styles and remove from html
     inline_style_list = get_inline_styles(html)
     for inline_style in inline_style_list:
