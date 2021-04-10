@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3 -B
 #
 # Blockable.py
 # This file implements all the necessary functions for blockable.
@@ -10,7 +10,7 @@ import os
 CONFIG_FILE_NAME = 'netlify.json'
 FIELDS_FILE_NAME = 'fields.json'
 IMPORT_KEY = "import"
-DESINATION = "tmp"
+TMP_FOLDER = "/tmp/blockable"
 CSS_FILE = "stylesheet.css"
 JS_FILE = "javascript.js"
 NETLIFY_INDEX = """
@@ -58,8 +58,8 @@ def main():
     if not os.path.isdir(final_desination):
         os.mkdir(final_desination)
 
-    os.system("cp -r " + DESINATION + "/* " + final_desination + "/")
-    os.system("rm -fdr " + DESINATION)
+    os.system("cp -r " + TMP_FOLDER + "/* " + final_desination + "/")
+    os.system("rm -fdr " + TMP_FOLDER)
 
 def get_absolute_path(path):
     # Remove end /
@@ -150,24 +150,24 @@ def get_data_dict():
 
 def prepare_desination():
     # Create new destination folder
-    os.system("rm -fdr " + DESINATION)
-    os.mkdir(DESINATION)
-    os.mkdir(DESINATION + "/" + "admin")
+    os.system("rm -fdr " + TMP_FOLDER)
+    os.mkdir(TMP_FOLDER)
+    os.mkdir(TMP_FOLDER + "/" + "admin")
 
     # Create asset directories
     for asset in ["css", "js"]:
         for template in ["", "layouts", "blocks"]:
-            os.mkdir(DESINATION + "/" + asset + "/" + template)
+            os.mkdir(TMP_FOLDER + "/" + asset + "/" + template)
 
 def move_assets():
     # Move everything in assets folder
     asset_list = os.listdir("assets")
     for asset in asset_list:
-        os.system("cp -r assets/" + asset + " " + DESINATION)
+        os.system("cp -r assets/" + asset + " " + TMP_FOLDER)
 
 def save(html, page_name):
     # Save html with given name
-    with open(DESINATION + "/" + page_name + '.html', 'w') as page:
+    with open(TMP_FOLDER + "/" + page_name + '.html', 'w') as page:
         page.write(html);
 
 def create_template_namespaces():
@@ -233,12 +233,12 @@ def execute_template(template_function, template_path, data):
     # Save css
     if css:
         html = ("<link rel='stylesheet' href='/css/" + template_path + ".css'>") + ("\n" + html)
-        with open(DESINATION + "/css/" + template_path + ".css", "w") as css_file:
+        with open(TMP_FOLDER + "/css/" + template_path + ".css", "w") as css_file:
             css_file.write(css)
 
     # Copy JS
     if os.path.isfile(template_path + "/" + JS_FILE):
-        os.system('cp ' + template_path + "/" + JS_FILE + " " + DESINATION + "/js/" + template_path + ".js")
+        os.system('cp ' + template_path + "/" + JS_FILE + " " + TMP_FOLDER + "/js/" + template_path + ".js")
         html = (html + "\n") + ("<script src='/js/" + template_path + ".js'></script>")
 
     return html
@@ -263,15 +263,15 @@ def create_config():
     parse_config(netlify_config)
  
     # Create admin folder
-    if not os.path.isdir(DESINATION):
-        os.mkdir(DESINATION)
-    if not os.path.isdir(DESINATION + "/admin"):
-        os.mkdir(DESINATION + "/admin")
+    if not os.path.isdir(TMP_FOLDER):
+        os.mkdir(TMP_FOLDER)
+    if not os.path.isdir(TMP_FOLDER + "/admin"):
+        os.mkdir(TMP_FOLDER + "/admin")
     
     # Populate netlify admin folder
-    with open(DESINATION + "/admin/" + 'index.html', 'w') as netlify_index_file:
+    with open(TMP_FOLDER + "/admin/" + 'index.html', 'w') as netlify_index_file:
         netlify_index_file.write(NETLIFY_INDEX)
-    with open(DESINATION + "/admin/" + 'config.yml', 'w') as netlify_yml_config:
+    with open(TMP_FOLDER + "/admin/" + 'config.yml', 'w') as netlify_yml_config:
         json.dump(netlify_config, netlify_yml_config, indent=4)
 
 def parse_config(netlify_config):
