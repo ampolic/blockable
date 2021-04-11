@@ -219,22 +219,24 @@ def execute_template(template_function, template_path, data):
     inline_style_list = get_inline_styles(html)
     for inline_style in inline_style_list:
         html = html.replace("<style>" + inline_style + "</style>", "")
-
-    # Get current css file
-    css = ""
-    if os.path.isfile(template_path + "/" + CSS_FILE):
-        with open(template_path + "/" + CSS_FILE, "r") as css_file:
-            css += css_file.read()
     
-    # Add inline style to css
+    # Add inline styles to inline stylesheet
+    inline_stylesheet = ""
     while len(inline_style_list) != 0:
-        css += inline_style_list.pop()
+        inline_stylesheet += inline_style_list.pop()
+    
+    # Save inline stylesheet
+    if inline_stylesheet:
+        inline_stylesheet_abs_path = get_inline_stylesheet_abs_path(template_path)
+        with open(TMP_FOLDER + inline_stylesheet_abs_path, "w") as inline_stylesheet_file:
+            inline_stylesheet_file.write(inline_stylesheet)
+        html = ("<link rel='stylesheet' href='" + inline_stylesheet_abs_path + "'>") + ("\n" + html)
 
-    # Save css
-    if css:
+    # Copy CSS
+    if os.path.isfile(template_path + "/" + CSS_FILE):
+        os.system('cp ' + template_path + "/" + CSS_FILE + " " + TMP_FOLDER + "/css/" + template_path + ".css")
         html = ("<link rel='stylesheet' href='/css/" + template_path + ".css'>") + ("\n" + html)
-        with open(TMP_FOLDER + "/css/" + template_path + ".css", "w") as css_file:
-            css_file.write(css)
+
 
     # Copy JS
     if os.path.isfile(template_path + "/" + JS_FILE):
@@ -242,6 +244,18 @@ def execute_template(template_function, template_path, data):
         html = (html + "\n") + ("<script src='/js/" + template_path + ".js'></script>")
 
     return html
+
+
+def get_inline_stylesheet_abs_path(template_path):
+    # Change ending if stylesheet already exists
+    inline_stylesheet_abs_path = "/css/" + template_path + "_is0.css"
+    while True:
+        i = 1
+        if os.path.isfile(TMP_FOLDER + inline_stylesheet_abs_path):
+            inline_stylesheet_abs_path = "/css/" + template_path + "_is" + str(i) + ".css"
+            i += 1
+        else:
+            return inline_stylesheet_abs_path
 
 def get_inline_styles(html):
     # Find start and end tags until no more start tags
