@@ -34,32 +34,95 @@ def main():
     
     # Set up arguments
     parser = argparse.ArgumentParser(description='Python based static site generator')
+    parser.add_argument('source', help='Set path to blockable folder')
     parser.add_argument('-N', '--netlify', action="store_true", help='Only compiles the Netlify components')
-    parser.add_argument('-I', '--input', help='Set path to input folder')
+    parser.add_argument('-i', '--init', action="store_true", help='Create simple blockable site framework')
     parser.add_argument('-O', '--output', help='Set path to output folder')
-   
+
+
+    # Create working tmp folder
+    if not os.path.isdir(TMP_FOLDER):
+        os.mkdir(TMP_FOLDER)  
+
     # Parse arguments
     args = vars(parser.parse_args())
-
-    if args["output"]:
-        final_desination = get_absolute_path(args["output"])
+    if args["init"]:
+        # Only create template
+        desination = args["source"]
+        create_template()
     else:
-        final_desination = get_absolute_path("public_html")
-    
-    if args["input"]:
-        os.chdir(args["input"])
+        # Get desination and mv into blockable source
+        desination = get_desination(args["output"])
+        if args["source"] != os.getcwd():
+            os.chdir(args["source"])
+       
+        # Create config/site depending on netlify arg
+        if not args["netlify"]: 
+            compile_site()
+        create_config()
 
-    if not args["netlify"]:
-        compile_site()
-   
-    create_config()
-   
+
     # Move to final destination and clean up
-    if not os.path.isdir(final_desination):
-        os.mkdir(final_desination)
+    if not os.path.isdir(desination):
+        os.mkdir(desination)
 
-    os.system("cp -r " + TMP_FOLDER + "/* " + final_desination + "/")
+    os.system("cp -r " + TMP_FOLDER + "/* " + desination + "/")
     os.system("rm -fdr " + TMP_FOLDER)
+
+def get_desination(desination):
+    # If a destination is passed in, get absolute path
+    if desination:
+        return get_absolute_path(desination)
+    else:
+        return get_absolute_path("public_html")
+
+def create_template():
+    # Create basic blockable instance folders
+    for folder in ["assets", "layouts", "blocks"]:
+        os.mkdir(TMP_FOLDER + "/" + folder)
+    for layout in ["homepage"]:
+        os.mkdir(TMP_FOLDER + "/layouts/" + layout)
+    for block in ["nav_bar", "about"]:
+        os.mkdir(TMP_FOLDER + "/blocks/" + block)
+    for asset in ["css", "js", "images"]:
+        os.mkdir(TMP_FOLDER + "/assets/" + asset)
+
+
+    # Create and save json files
+    netlify_config = {
+        "backend": {"name": "github","repo": "user/repo_name","branch": "main","site_domain": "cms.netlify.com","api_root": "https://api.github.com"},
+        "media_folder": "assets/images",
+        "collections": [
+            {"label": "Settings", "name": "settings", "files": [
+                {"label": "Nav Bar", "name": "nav_bar", "import": "blocks/nav_bar"}
+                ]
+            },
+            {"label": "Pages","name": "pages","files": [
+                {"import": "layouts/homepage", "label": "Homepage", "name": "index"},
+                ]
+            }
+        ]
+    }
+    homepage_fields = [
+        {"label": "Title", "name": "title", "widget": "string"},
+	{"label": "About", "name":"about", "import": "blocks/about"}
+    ]
+    about_fields = [
+        {"label": "About", "name": "about", "widget": "string"}
+    ]
+    nav_bar_fields = [
+        {"label": "Site Color", "name": "site-color", "widget": "color"}
+    ]
+
+    save_json(TMP_FOLDER + "/netlify.json", netlify_config)
+    save_json(TMP_FOLDER + "/layouts/homepage/" + FIELDS_FILE_NAME, homepage_fields)
+    save_json(TMP_FOLDER + "/blocks/about/" + FIELDS_FILE_NAME, about_fields)
+    save_json(TMP_FOLDER + "/blocks/nav_bar/" + FIELDS_FILE_NAME, nav_bar_fields)
+
+
+def save_json(path, data):
+    with open(path, 'w') as f:
+        json.dump(data, f, indent=4)
 
 def get_absolute_path(path):
     # Remove end /
@@ -73,7 +136,6 @@ def get_absolute_path(path):
         return os.getcwd() + "/" + path
 
 def compile_site():
-
     # Get data dict
     data_dict = get_data_dict()
 
@@ -150,8 +212,6 @@ def get_data_dict():
 
 def prepare_desination():
     # Create new destination folder
-    os.system("rm -fdr " + TMP_FOLDER)
-    os.mkdir(TMP_FOLDER)
     os.mkdir(TMP_FOLDER + "/" + "admin")
 
     # Create asset directories
@@ -276,9 +336,7 @@ def create_config():
     # Parse Netlify config
     parse_config(netlify_config)
  
-    # Create admin folder
-    if not os.path.isdir(TMP_FOLDER):
-        os.mkdir(TMP_FOLDER)
+    # Create admin folder 
     if not os.path.isdir(TMP_FOLDER + "/admin"):
         os.mkdir(TMP_FOLDER + "/admin")
     
