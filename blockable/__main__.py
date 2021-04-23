@@ -12,7 +12,7 @@ def main():
     # Import modules
     import argparse
     from .template import create_template
-    from .generator import compile_site
+    from .core import compile_site
     from .netlify import create_config
 
     # Set up arguments

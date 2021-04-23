@@ -1,5 +1,5 @@
 """
-file: generator.py
+file: core.py
 
 This file implements all the functions necessary for blockable to 
 compile a project folder into a folder of html
@@ -40,7 +40,7 @@ def compile_site():
             from .blockable import get_template
 
             data = parse_json("data/" + path)
-            html = get_template("layouts/" + layout)(data)
+            html = str(get_template("layouts/" + layout)(data))
             save(html, data_file[:-5])
 
     # Move assets

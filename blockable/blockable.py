@@ -5,7 +5,7 @@ This file contains functions and constants used by the other various modules of
 blockable
 """
 
-# Set constant
+# Set constants
 TMP_FOLDER = "/tmp/blockable"
 
 

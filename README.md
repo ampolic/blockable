@@ -85,6 +85,38 @@ module which contains every block you defined in your blocks folder accessible b
   blocks.nav_bar(data["nav_bar"])
   ```
 
+# Asset Functions
+
+To include stylesheets within your program, developers should import the function assets from blockable:
+
+```python
+from blockable import assets
+```
+
+The asset function accepts a path to an asset from your root blockable directory and returns the link to that asset in the final
+compiled site:
+
+```
+site_sheet = assets("assets/css/stylesheet.css")
+layout_js = assets("layouts/homepage/javascript.js")
+````
+
+In order to keep your site csp compliment, developers should also make use of the dynamic_css function:
+
+```python
+from blockable import dynamic_css
+```
+
+dynamic_css accepts a string of css and returns a link to a newly created stylesheet:
+
+```python
+custom_css = dynamic_css("""
+.my_class {
+	color: black;	
+}
+""")
+```
+
 # Netlify
 
 Currently Blockable only supports Netlify as a CMS although support for more CMSs is planned in the future. In order to use Netlify,
