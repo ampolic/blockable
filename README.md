@@ -62,34 +62,28 @@ Data-based collections are collections which have multiple pages all using the s
 are collections where each page has a unique layout and data file associated with it. I.e. data-based collections are useful for blogs, shops, etc
 while layout-based collection are useful for unique pages such as a homepage, about us, contact, etc.
 
-
 ### Templates
 
 We use template as a catch all term to represent files capable of generating HTML when given a data file.
-
 
 ## Documentation
 
 Blockable is still a work in progress (see goals for more information), however in its current state, Blockable is designed
 to work like so:
 
-When creating a website, there should be three primary folders: Blocks, Layouts, and Assets. The assets folder should contain
+When creating a website, there should be three primary folders: blocks, layouts, and assets. The assets folder should contain
 a folder for each type of asset you want site wide (css, js, fonts, images, etc.). The blocks and layouts folder mimic each other
 in that each folder should contain a folder for each block/layout you want to create. These folders should then contain an index.py, a 
 stylesheet.css and javascript.js if necessary, and a fields.json (more on this later).   
 
-Index.py should define one main function called html(). This function should accept one variable (which will contain a dictionary of all the data
-requested in fields.json), and it should return a string of the html for that template. When writing your templates, you should make use of the
-'layouts' and 'blocks' objects by importing them form the module 'blockable'. Both these objects contain an attriube linking to the function of
-their respective template function:   
+index.py should define one main function called main(). This function should accept one variable (which will contain a dictionary of all the data
+requested in fields.json), and it should return a string of the html for that template. When writing your templates, you should make use of the blockable.blocks
+module which contains every block you defined in your blocks folder accessible by the name of the folder:
 
   ```python
   from blockable import blocks
   blocks.nav_bar(data["nav_bar"])
   ```
-
-Although the main purpose if what's see above (importing blocks into layouts), these functions may be used in any combination (I.e. add blocks 
-to other blocks or even add layouts to blocks), so long as you avoid recursive calls.
 
 # Netlify
 
@@ -112,6 +106,16 @@ import dictionary for any extra templates used.
 Finally, run
 
   ```
-  python blockable.py -N
+  python -m blockable -N
   ```
 which will generate a working config.yml for Netlify to use.
+
+# Complication
+
+To compile your site into static html, simply run 
+
+```
+python -m blockable [source]
+```
+
+Where source is your blockable directory. You may also make use of the -O parameter which allows you to set where the html will be outputted.
