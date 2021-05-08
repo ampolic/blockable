@@ -9,13 +9,21 @@ blockable
 TMP_FOLDER = "/tmp/blockable"
 
 
+# Disable pycache
+import sys
+sys.dont_write_bytecode = True
+
+
 def get_template(template_path):
-    # This function accepts a template path and returns the function of that template
+    """
+    This function accepts a template path and returns the
+    function of that template
+    """
 
     # Add template path
     import sys
     sys.path.insert(1, template_path)
-    
+
     # Import html function then clean up sys path
     from index import main as template_function
     sys.modules.pop("index")

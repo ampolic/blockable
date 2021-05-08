@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='blockable',
-      version='0.8',
+      version='0.9',
       description="Ampolic's custom site generator",
       author='Ampolic Digital Solutions LLC',
       author_email='sam@ampolic.com',

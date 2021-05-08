@@ -1,7 +1,7 @@
 """
 file: core.py
 
-This file implements all the functions necessary for blockable to 
+This file implements all the functions necessary for blockable to
 compile a project folder into a folder of html
 """
 
@@ -19,15 +19,15 @@ def compile_site():
 
     # Get collection
     collection_list = os.listdir("data")
-    
+
     # Loop though data
     for collection in collection_list:
         data_file_list = os.listdir("data/" + collection)
         for data_file in data_file_list:
-            
+
             # Get path
             path = collection + "/" + data_file
-            
+
             # Get layout
             if path in data_dict:
                 layout = data_dict[path]
@@ -46,10 +46,11 @@ def compile_site():
     # Move assets
     move_assets()
 
+
 def get_data_dict():
     """
-    This function creates a returns a mapping from the directory of a json data file
-    to the directory of the layout it uses
+    This function creates a returns a mapping from the directory of a
+    json data file to the directory of the layout it uses
     """
 
     # Initialize dict
@@ -58,7 +59,7 @@ def get_data_dict():
     # Populate dict
     netlify_config = parse_json("netlify.json")
     for collection in netlify_config["collections"]:
-        if "files" in collection: # Collection is layout-based
+        if "files" in collection:  # Collection is layout-based
             for page in collection["files"]:
 
                 # Get import info
@@ -67,19 +68,21 @@ def get_data_dict():
 
                 # Ensure import is layout
                 if import_name[:break_point] == "layouts":
-                    data_dict[collection["name"] + "/" + page["name"] + ".json"] = import_name[break_point+1:]
+                    layout_name = collection["name"]
+                    data_file = layout_name + "/" + page["name"] + ".json"
+                    data_dict[data_file] = import_name[break_point+1:]
 
-        else: # Collection is data-based
+        else:  # Collection is data-based
+            # Get import info
+            import_name = collection["import"]
+            break_point = import_name.find("/")
 
-           # Get import info
-           import_name = collection["import"]
-           break_point = import_name.find("/")
-
-           # Ensure import is layout
-           if import_name[:break_point] == "layouts":
-               data_dict[collection["name"]] = import_name[break_point+1:]
+            # Ensure import is layout
+            if import_name[:break_point] == "layouts":
+                data_dict[collection["name"]] = import_name[break_point+1:]
 
     return data_dict
+
 
 def prepare_desination():
     # Create new destination folder
@@ -87,9 +90,8 @@ def prepare_desination():
 
     # Create asset directories
     for asset in ["css", "js"]:
-        for template in ["", "layouts", "blocks"]:
-            os.mkdir(TMP_FOLDER + "/" + asset + "/" + template)
-    os.mkdir(TMP_FOLDER + "/css/dynamic_css")
+        os.mkdir(TMP_FOLDER + "/" + asset)
+
 
 def move_assets():
     # Move everything in assets folder
@@ -97,9 +99,8 @@ def move_assets():
     for asset in asset_list:
         os.system("cp -r assets/" + asset + " " + TMP_FOLDER)
 
+
 def save(html, page_name):
     # Save html with given name
-    with open(TMP_FOLDER + "/" + page_name + '.html', 'w') as page:
-        page.write(html);
-
-
+    with open(TMP_FOLDER + "/" + page_name + '.html', 'w') as f:
+        f.write(html)

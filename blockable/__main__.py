@@ -8,6 +8,8 @@ This file implments the command line interface for blockable
 import os
 from .blockable import TMP_FOLDER
 
+
+
 def main():
     # Import modules
     import argparse
@@ -15,18 +17,36 @@ def main():
     from .core import compile_site
     from .netlify import create_config
 
-    # Set up arguments
-    parser = argparse.ArgumentParser(description='Python based static site generator')
-    parser.add_argument('source', help='Set path to blockable folder')
-    parser.add_argument('-N', '--netlify', action="store_true", help='Only compiles the Netlify components')
-    parser.add_argument('-i', '--init', action="store_true", help='Create simple blockable site framework')
-    parser.add_argument('-O', '--output', help='Set path to output folder. Defaults to pwd/public_html')
 
+    # Set up arguments
+    parser = argparse.ArgumentParser(
+            description='Python based static site generator'
+            )
+    parser.add_argument(
+            'source',
+            help='Set path to blockable folder'
+            )
+    parser.add_argument(
+            '-N', '--netlify',
+            action="store_true",
+            help='Only compiles the Netlify components'
+            )
+    parser.add_argument(
+            '-i',
+            '--init',
+            action="store_true",
+            help='Create simple blockable site framework'
+            )
+    parser.add_argument(
+            '-O',
+            '--output',
+            help='Set path to output folder. Defaults to pwd/public_html'
+            )
 
     # Create working tmp folder
     if os.path.isdir(TMP_FOLDER):
         os.system("rm -fdr " + TMP_FOLDER)
-    os.mkdir(TMP_FOLDER)  
+    os.mkdir(TMP_FOLDER)
 
     # Parse arguments
     args = vars(parser.parse_args())
@@ -39,12 +59,11 @@ def main():
         desination = get_desination(args["output"])
         if args["source"] != os.getcwd():
             os.chdir(args["source"])
-       
+
         # Create config/site depending on netlify arg
-        if not args["netlify"]: 
+        if not args["netlify"]:
             compile_site()
         create_config()
-
 
     # Move to final destination and clean up
     if not os.path.isdir(desination):

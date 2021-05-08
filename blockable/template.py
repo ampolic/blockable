@@ -9,6 +9,7 @@ instance for people to get started with
 import os
 import json
 from .blockable import TMP_FOLDER
+from .netlify import FIELDS_FILE_NAME as FFN
 
 
 def create_template():
@@ -22,25 +23,44 @@ def create_template():
     for asset in ["css", "js", "images"]:
         os.mkdir(TMP_FOLDER + "/assets/" + asset)
 
-
     # Create and save json files
     netlify_config = {
-        "backend": {"name": "github","repo": "user/repo_name","branch": "main","site_domain": "cms.netlify.com","api_root": "https://api.github.com"},
+        "backend": {
+            "name": "github",
+            "repo": "user/repo_name",
+            "branch": "main",
+            "site_domain": "cms.netlify.com",
+            "api_root": "https://api.github.com"
+        },
         "media_folder": "assets/images",
         "collections": [
-            {"label": "Settings", "name": "settings", "files": [
-                {"label": "Nav Bar", "name": "nav_bar", "import": "blocks/nav_bar"}
+            {
+                "label": "Settings",
+                "name": "settings",
+                "files": [
+                    {
+                        "label": "Nav Bar",
+                        "name": "nav_bar",
+                        "import": "blocks/nav_bar"
+                    }
                 ]
             },
-            {"label": "Pages","name": "pages","files": [
-                {"import": "layouts/homepage", "label": "Homepage", "name": "index"},
+            {
+                "label": "Pages",
+                "name": "pages",
+                "files": [
+                    {
+                        "import": "layouts/homepage",
+                        "label": "Homepage",
+                        "name": "index"
+                    },
                 ]
             }
         ]
     }
     homepage_fields = [
         {"label": "Title", "name": "title", "widget": "string"},
-	{"label": "About", "name":"about", "import": "blocks/about"}
+        {"label": "About", "name": "about", "import": "blocks/about"}
     ]
     about_fields = [
         {"label": "About", "name": "about", "widget": "string"}
@@ -50,9 +70,9 @@ def create_template():
     ]
 
     save_json(TMP_FOLDER + "/netlify.json", netlify_config)
-    save_json(TMP_FOLDER + "/layouts/homepage/" + FIELDS_FILE_NAME, homepage_fields)
-    save_json(TMP_FOLDER + "/blocks/about/" + FIELDS_FILE_NAME, about_fields)
-    save_json(TMP_FOLDER + "/blocks/nav_bar/" + FIELDS_FILE_NAME, nav_bar_fields)
+    save_json(TMP_FOLDER + "/layouts/homepage/" + FFN, homepage_fields)
+    save_json(TMP_FOLDER + "/blocks/about/" + FFN, about_fields)
+    save_json(TMP_FOLDER + "/blocks/nav_bar/" + FFN, nav_bar_fields)
 
 
 def save_json(path, data):
