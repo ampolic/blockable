@@ -5,13 +5,12 @@ This file contains functions and constants used by the other various modules of
 blockable
 """
 
-# Set constants
-TMP_FOLDER = "/tmp/blockable"
-
-
 # Disable pycache
 import sys
 sys.dont_write_bytecode = True
+
+# Set constants
+TMP_FOLDER = "/tmp/blockable"
 
 
 def get_template(template_path):

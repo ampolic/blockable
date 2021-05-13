@@ -87,30 +87,29 @@ module which contains every block you defined in your blocks folder accessible b
 
 # Asset Functions
 
-To include stylesheets within your program, developers should import the function assets from blockable:
+To include stylesheets and javascript within your program, developers should import the load_css and load_js functions from blockable:
 
 ```python
-from blockable import assets
+from blockable import load_css, load_js
 ```
 
-The asset function accepts a path to an asset from your root blockable directory and returns the link to that asset in the final
-compiled site:
+These functions accepts a path to an asset from your root blockable directory and returns a tag for that final asset:
 
 ```
-site_sheet = assets("assets/css/stylesheet.css")
-layout_js = assets("layouts/homepage/javascript.js")
+site_sheet = load_css("assets/css/stylesheet.css")
+layout_js = load_js("layouts/homepage/javascript.js")
 ````
 
-In order to keep your site csp compliment, developers should also make use of the dynamic_css function:
+In order to keep your site csp compliment, developers should also make use of the save_css function:
 
 ```python
-from blockable import dynamic_css
+from blockable import save_css
 ```
 
-dynamic_css accepts a string of css and returns a link to a newly created stylesheet:
+save_css accepts a string of css and returns a style tag for the newly created stylesheet:
 
 ```python
-custom_css = dynamic_css("""
+custom_css = save_css("""
 .my_class {
 	color: black;	
 }

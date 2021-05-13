@@ -9,14 +9,12 @@ import os
 from .blockable import TMP_FOLDER
 
 
-
 def main():
     # Import modules
     import argparse
     from .template import create_template
     from .core import compile_site
     from .netlify import create_config
-
 
     # Set up arguments
     parser = argparse.ArgumentParser(
@@ -60,10 +58,11 @@ def main():
         if args["source"] != os.getcwd():
             os.chdir(args["source"])
 
-        # Create config/site depending on netlify arg
-        if not args["netlify"]:
+        # Create config/site depending on netlify parameter
+        if args["netlify"]:
+            create_config()
+        else:
             compile_site()
-        create_config()
 
     # Move to final destination and clean up
     if not os.path.isdir(desination):

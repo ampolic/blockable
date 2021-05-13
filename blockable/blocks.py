@@ -5,6 +5,7 @@ This file is meant to be imported by developers so they can
 access all the block functions in their "blocks" folder
 """
 
+
 def initalize_blocks():
     # Import modules
     import os
