@@ -28,7 +28,7 @@ def main():
     destination = interpret_args(args)
 
     # Move to final destination and clean up
-    move_to_destination(destination)
+    sudo(destination, "cp -r " + TMP_FOLDER + "/* " + destination + "/")
     os.system("rm -fdr " + TMP_FOLDER)
 
 
@@ -37,9 +37,9 @@ def interpret_args(args):
     # Get and prepare destination
     destination = get_absolute_path(args["destination"])
     if args["clean"]:
-        os.system("rm -fdr " + destination)
+        sudo(destination, "rm -fdr " + destination)
     if not os.path.isdir(destination):
-        os.mkdir(destination)
+        sudo(destination, "mkdir " + destination)
 
     # Only create template if init
     if args["init"]:
@@ -57,6 +57,13 @@ def interpret_args(args):
     create_config()
 
     return destination
+
+
+def sudo(folder, command):
+    if os.access(folder, os.W_OK):
+        os.system(command)
+    else:
+        os.system("sudo " + command)
 
 
 def get_args():
@@ -94,15 +101,6 @@ def get_args():
 
     # Return parsed arguments
     return vars(parser.parse_args())
-
-
-def move_to_destination(destination):
-    # Check if destination is writable
-    copy_command = "cp -r " + TMP_FOLDER + "/* " + destination + "/"
-    if os.access(destination, os.W_OK):
-        os.system(copy_command)
-    else:
-        os.system("sudo " + copy_command)
 
 
 def get_absolute_path(path):
