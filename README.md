@@ -100,7 +100,9 @@ site_sheet = load_css("assets/css/stylesheet.css")
 layout_js = load_js("layouts/homepage/javascript.js")
 ````
 
-In order to keep your site csp compliment, developers should also make use of the save_css function:
+Note that the css/js folders are not copied into the destination folder when complied unless you load
+it using the load_css function. In order to keep your site csp compliment, developers should also make 
+use of the save_css function:
 
 ```python
 from blockable import save_css

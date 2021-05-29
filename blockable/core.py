@@ -95,7 +95,16 @@ def prepare_desination():
 
 def move_assets():
     # Move everything in assets folder
+
+    # Get list of assets
     asset_list = os.listdir("assets")
+
+    # Remove css and js assets
+    for asset in ["css", "js"]:
+        if asset in asset_list:
+            asset_list.remove(asset)
+
+    # Move remaining assets
     for asset in asset_list:
         os.system("cp -r assets/" + asset + " " + TMP_FOLDER)
 
