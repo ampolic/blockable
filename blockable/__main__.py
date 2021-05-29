@@ -6,15 +6,60 @@ This file implments the command line interface for blockable
 
 # Import modules
 import os
+import argparse
+
 from .blockable import TMP_FOLDER
+from .template import create_template
+from .core import compile_site
+from .netlify import create_config
 
 
 def main():
-    # Import modules
-    import argparse
-    from .template import create_template
-    from .core import compile_site
-    from .netlify import create_config
+
+    # Create working directory
+    if os.path.isdir(TMP_FOLDER):
+        os.system("rm -fdr " + TMP_FOLDER)
+    os.mkdir(TMP_FOLDER)
+
+    # Get arguments
+    args = get_args()
+
+    # Interpret arguments
+    destination = interpret_args(args)
+
+    # Move to final destination and clean up
+    move_to_destination(destination)
+    os.system("rm -fdr " + TMP_FOLDER)
+
+
+def interpret_args(args):
+
+    # Get and prepare destination
+    destination = get_absolute_path(args["destination"])
+    if args["clean"]:
+        os.system("rm -fdr " + destination)
+    if not os.path.isdir(destination):
+        os.mkdir(destination)
+
+    # Only create template if init
+    if args["init"]:
+        destination = args["source"]
+        create_template()
+        return destination
+
+    # Change pwd to blockable instance
+    if args["source"] != os.getcwd():
+        os.chdir(args["source"])
+
+    # Create config/site depending on netlify parameter
+    if not args["netlify"]:
+        compile_site()
+    create_config()
+
+    return destination
+
+
+def get_args():
 
     # Set up arguments
     parser = argparse.ArgumentParser(
@@ -23,6 +68,17 @@ def main():
     parser.add_argument(
             'source',
             help='Set path to blockable folder'
+            )
+    parser.add_argument(
+            'destination',
+            nargs='?',
+            default='public_html',
+            help='Set path to output folder. Defaults to pwd/public_html'
+            )
+    parser.add_argument(
+            '-C', '--clean',
+            action="store_true",
+            help='Deletes everything in the output folder'
             )
     parser.add_argument(
             '-N', '--netlify',
@@ -35,54 +91,18 @@ def main():
             action="store_true",
             help='Create simple blockable site framework'
             )
-    parser.add_argument(
-            '-O',
-            '--output',
-            help='Set path to output folder. Defaults to pwd/public_html'
-            )
 
-    # Create working tmp folder
-    if os.path.isdir(TMP_FOLDER):
-        os.system("rm -fdr " + TMP_FOLDER)
-    os.mkdir(TMP_FOLDER)
+    # Return parsed arguments
+    return vars(parser.parse_args())
 
-    # Parse arguments
-    args = vars(parser.parse_args())
-    if args["init"]:
-        # Only create template
-        destination = args["source"]
-        create_template()
-    else:
-        # Get destination and mv into blockable source
-        destination = get_destination(args["output"])
-        if args["source"] != os.getcwd():
-            os.chdir(args["source"])
 
-        # Create config/site depending on netlify parameter
-        if args["netlify"]:
-            create_config()
-        else:
-            compile_site()
-
-    # Move to final destination and clean up
-    if not os.path.isdir(destination):
-        os.mkdir(destination)
-
+def move_to_destination(destination):
     # Check if destination is writable
     copy_command = "cp -r " + TMP_FOLDER + "/* " + destination + "/"
     if os.access(destination, os.W_OK):
         os.system(copy_command)
     else:
         os.system("sudo " + copy_command)
-    os.system("rm -fdr " + TMP_FOLDER)
-
-
-def get_destination(destination):
-    # If a destination is passed in, get absolute path
-    if destination:
-        return get_absolute_path(destination)
-    else:
-        return get_absolute_path("public_html")
 
 
 def get_absolute_path(path):
