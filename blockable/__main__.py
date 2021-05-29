@@ -50,11 +50,11 @@ def main():
     args = vars(parser.parse_args())
     if args["init"]:
         # Only create template
-        desination = args["source"]
+        destination = args["source"]
         create_template()
     else:
-        # Get desination and mv into blockable source
-        desination = get_desination(args["output"])
+        # Get destination and mv into blockable source
+        destination = get_destination(args["output"])
         if args["source"] != os.getcwd():
             os.chdir(args["source"])
 
@@ -65,17 +65,22 @@ def main():
             compile_site()
 
     # Move to final destination and clean up
-    if not os.path.isdir(desination):
-        os.mkdir(desination)
+    if not os.path.isdir(destination):
+        os.mkdir(destination)
 
-    os.system("cp -r " + TMP_FOLDER + "/* " + desination + "/")
+    # Check if destination is writable
+    copy_command = "cp -r " + TMP_FOLDER + "/* " + destination + "/"
+    if os.access(destination, os.W_OK):
+        os.system(copy_command)
+    else:
+        os.system("sudo " + copy_command)
     os.system("rm -fdr " + TMP_FOLDER)
 
 
-def get_desination(desination):
+def get_destination(destination):
     # If a destination is passed in, get absolute path
-    if desination:
-        return get_absolute_path(desination)
+    if destination:
+        return get_absolute_path(destination)
     else:
         return get_absolute_path("public_html")
 
