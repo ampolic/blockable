@@ -136,12 +136,15 @@ Folder-based collections (or data-based collections) are created in a similar wa
 Next place a fields.json file in every template folder. This file should contain a list of each Netlify field for that template and, if necessary, the above
 import dictionary for any extra templates used.   
 
-Finally, run
+For settings pages, you can create a new collection and set the files to be imported blocks. Developers can then use the site_data function
+to access any settings data.
+
+Finally, developers can run
 
   ```
-  python -m blockable -N
+  python -m blockable [source] -N
   ```
-which will generate a working config.yml for Netlify to use.
+to generate a working config.yml for Netlify to use.
 
 # Complication
 
@@ -151,4 +154,4 @@ To compile your site into static html, simply run
 python -m blockable [source]
 ```
 
-Where source is your blockable directory. You may also make use of the -O parameter which allows you to set where the html will be outputted.
+Where source is your blockable directory. You may also make use of the second optional destination parameter to set where the html will be outputted.
