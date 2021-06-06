@@ -46,14 +46,14 @@ def load_js(asset_path):
 def save_js(js):
 
     # Save asset and get hash
-    hash_val = save_asset(js, "js")
+    asset_path, hash_val = save_asset(js, "js")
 
     # Create script tag
-    src = f"src='/js/{hash_val}.js'"
+    src = f"src='{asset_path}'"
     integrity = f"integrity='sha256-{hash_val}'"
     crossorigin = "crossorigin='anonymous'"
     _async = "async='async'"
-    style_tag = f"<script {src} {integrity} {crossorigin} {_async}>"
+    style_tag = f"<script {src} {integrity} {crossorigin} {_async}></script>"
 
     # Return tag
     return style_tag
@@ -62,10 +62,10 @@ def save_js(js):
 def save_css(css):
 
     # Save asset and get hash
-    hash_val = save_asset(css, "css")
+    asset_path, hash_val = save_asset(css, "css")
 
     # Create style tag
-    href = f"href='/css/{hash_val}.css'"
+    href = f"href='{asset_path}'"
     style_tag = f"<link rel='stylesheet' type='text/css' {href}>"
 
     # Return tag
@@ -79,10 +79,14 @@ def save_asset(asset, file_type):
     the hash of the asset
     """
 
-    # Get hash and path
+    # Get hashs
     import hashlib
-    hash_val = hashlib.sha256(asset.encode('UTF-8')).hexdigest()
-    asset_name = hash_val + "." + file_type
+    import base64
+    sha_256 = hashlib.sha256(asset.encode('UTF-8'))
+    hex_hash = sha_256.hexdigest()
+    base_64_hash = base64.b64encode(sha_256.digest()).decode()
+
+    asset_name = hex_hash + "." + file_type
     asset_path = file_type + "/" + asset_name
 
     # Move asset
@@ -91,4 +95,4 @@ def save_asset(asset, file_type):
             f.write(asset)
 
     # Return asset name
-    return hash_val
+    return asset_path, base_64_hash
