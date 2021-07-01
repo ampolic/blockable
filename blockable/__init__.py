@@ -53,7 +53,9 @@ def save_js(js):
     integrity = f"integrity='sha256-{hash_val}'"
     crossorigin = "crossorigin='anonymous'"
     _async = "async='async'"
-    style_tag = f"<script {src} {integrity} {crossorigin} {_async}></script>"
+    nonce = "nonce='8IBTHwOdqNKAWeKl7plt8g=='"
+    defer = "defer async"
+    style_tag = f"<script {src} {integrity} {crossorigin} {_async} {nonce} {defer}></script>"
 
     # Return tag
     return style_tag
@@ -87,11 +89,11 @@ def save_asset(asset, file_type):
     base_64_hash = base64.b64encode(sha_256.digest()).decode()
 
     asset_name = hex_hash + "." + file_type
-    asset_path = file_type + "/" + asset_name
+    asset_path = "/" + file_type + "/" + asset_name
 
     # Move asset
     if not os.path.isdir(TMP_FOLDER + "/" + asset_path):
-        with open(TMP_FOLDER + "/" + asset_path, 'w') as f:
+        with open(TMP_FOLDER + asset_path, 'w') as f:
             f.write(asset)
 
     # Return asset name
