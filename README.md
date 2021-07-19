@@ -122,7 +122,7 @@ custom_css = save_css("""
 # Netlify
 
 Currently Blockable only supports Netlify as a CMS although support for more CMSs is planned in the future. In order to use Netlify,
-developers should create a netlify.json file and fill it out like a normal config.yml for Netlify (See Netlify documentation for information).
+developers should create a config.json file and fill it out like a normal config.yml for Netlify (See Netlify documentation for information).
 The only difference is that when it comes to defining collections.   
 
 File-based collections (or layout-based collections) are accomplished by defining the collection like normal, except for the "files" section
@@ -143,7 +143,7 @@ to access any settings data.
 Finally, developers can run
 
   ```
-  python -m blockable [source] -N
+  python -m blockable <source> -M
   ```
 to generate a working config.yml for Netlify to use.
 
@@ -152,7 +152,7 @@ to generate a working config.yml for Netlify to use.
 To compile your site into html, simply run 
 
 ```
-python -m blockable [source] <output>
+python -m blockable <source> <output>
 ```
 
 Where source is your blockable directory. You may also make use of the second optional destination parameter to set where the html will be outputted.

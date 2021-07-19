@@ -52,9 +52,13 @@ def interpret_args(args):
         os.chdir(args["source"])
 
     # Create config/site depending on netlify parameter
-    if not args["netlify"]:
+    if args["netlify"]:
+        create_config()
+
+    if args["only_netlify"]:
+        create_config()
+    else:
         compile_site()
-    create_config()
 
     return destination
 
@@ -74,6 +78,8 @@ def get_args():
             )
     parser.add_argument(
             'source',
+            nargs='?',
+            default='./',
             help='Set path to blockable folder'
             )
     parser.add_argument(
@@ -88,7 +94,12 @@ def get_args():
             help='Deletes everything in the output folder'
             )
     parser.add_argument(
-            '-N', '--netlify',
+            '-n', '--netlify',
+            action="store_true",
+            help='Compiles the Netlify components'
+            )
+    parser.add_argument(
+            '-N', '--only-netlify',
             action="store_true",
             help='Only compiles the Netlify components'
             )

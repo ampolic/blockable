@@ -11,7 +11,7 @@ import json
 import os
 from .blockable import TMP_FOLDER, parse_json
 
-CONFIG_FILE_NAME = 'netlify.json'
+CONFIG_FILE_NAME = 'config.json'
 FIELDS_FILE_NAME = 'fields.json'
 IMPORT_KEY = "import"
 NETLIFY_INDEX = """
