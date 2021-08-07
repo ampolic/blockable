@@ -8,6 +8,7 @@ compile a project folder into a folder of html
 # Import modules and set constants
 import os
 from .blockable import TMP_FOLDER, parse_json
+from .netlify import CONFIG_FILE_NAME
 
 
 def compile_site():
@@ -57,7 +58,7 @@ def get_data_dict():
     data_dict = {}
 
     # Populate dict
-    netlify_config = parse_json("netlify.json")
+    netlify_config = parse_json(CONFIG_FILE_NAME)
     for collection in netlify_config["collections"]:
         if "files" in collection:  # Collection is layout-based
             for page in collection["files"]:
@@ -85,8 +86,10 @@ def get_data_dict():
 
 
 def prepare_desination():
-    # Create new destination folder
-    os.mkdir(TMP_FOLDER + "/" + "admin")
+
+    if not os.path.isdir(TMP_FOLDER + "/" + "admin"):
+        # Create new destination folder
+        os.mkdir(TMP_FOLDER + "/" + "admin")
 
     # Create asset directories
     for asset in ["css", "js"]:
