@@ -24,7 +24,12 @@ def get_template(template_path):
     sys.path.insert(1, template_path)
 
     # Import html function then clean up sys path
-    from index import main as template_function
+    try:
+        from index import main as template_function
+    except ImportError:
+        print(f"No index.py file found at {template_path}")
+        quit()
+
     sys.modules.pop("index")
     sys.path.remove(template_path)
 

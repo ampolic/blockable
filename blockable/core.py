@@ -93,8 +93,10 @@ def get_data_dict():
 
 
 def prepare_desination():
-    # Create new destination folder
-    os.mkdir(TMP_FOLDER + "/" + "admin")
+
+    if not os.path.isdir(TMP_FOLDER + "/" + "admin"):
+        # Create new destination folder
+        os.mkdir(TMP_FOLDER + "/" + "admin")
 
     # Create asset directories
     for asset in ["css", "js"]:
