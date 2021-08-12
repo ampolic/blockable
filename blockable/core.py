@@ -8,6 +8,7 @@ compile a project folder into a folder of html
 # Import modules and set constants
 import os
 from .blockable import TMP_FOLDER, parse_json
+from .netlify import CONFIG_FILE_NAME
 
 
 def compile_site():
@@ -53,11 +54,18 @@ def get_data_dict():
     json data file to the directory of the layout it uses
     """
 
+    # Get config
+    try:
+        netlify_config = parse_json(CONFIG_FILE_NAME)
+    except FileNotFoundError:
+        pwd = os.getcwd()
+        print(f"No {CONFIG_FILE_NAME} found in {pwd}. Is {pwd} a blockable instance?")
+        quit()
+
     # Initialize dict
     data_dict = {}
 
     # Populate dict
-    netlify_config = parse_json("netlify.json")
     for collection in netlify_config["collections"]:
         if "files" in collection:  # Collection is layout-based
             for page in collection["files"]:
