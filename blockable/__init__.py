@@ -7,12 +7,46 @@ for creating sites
 
 # Import modules
 import os
+import hashlib
+import base64
 from .blockable import TMP_FOLDER, parse_json
 
 
 def site_data(path):
     # Function to be imported and allow access to site data
     return parse_json("data/" + path + ".json")
+
+
+def load_custom(asset_path):
+    """
+    Loads any asset from a blockable instance and moves it to
+    a custom folder. Returns path to moved asset
+    """
+
+    # Get file type
+    dot_index = asset_path.rfind(".")
+    file_type = asset_path[dot_index+1:]
+
+    # Get name based on sha256 hash
+    sha256_hash = hashlib.sha256()
+    with open(asset_path, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    asset_name = sha256_hash.hexdigest()
+
+    # Add file type to asset name and get destination
+    asset_name = asset_name + "." + file_type
+    destination = "/" + "custom" + "/" + asset_name
+
+    # Ensure custom folder is present
+    if not os.path.isdir(TMP_FOLDER + "/" + "custom"):
+        os.mkdir(TMP_FOLDER + "/" + "custom")
+
+    # Copy asset to destination
+    os.system("cp " + asset_path + " " + TMP_FOLDER + destination)
+
+    # Return path to image destination
+    return destination
 
 
 def load_css(asset_path):
@@ -55,7 +89,8 @@ def save_js(js):
     _async = "async='async'"
     nonce = "nonce='8IBTHwOdqNKAWeKl7plt8g=='"
     defer = "defer async"
-    style_tag = f"<script {src} {integrity} {crossorigin} {_async} {nonce} {defer}></script>"
+    style_tag = f"""<script {src} {integrity} {crossorigin} {_async} {nonce} {defer}>
+    </script>"""
 
     # Return tag
     return style_tag
@@ -82,8 +117,6 @@ def save_asset(asset, file_type):
     """
 
     # Get hashs
-    import hashlib
-    import base64
     sha_256 = hashlib.sha256(asset.encode('UTF-8'))
     hex_hash = sha_256.hexdigest()
     base_64_hash = base64.b64encode(sha_256.digest()).decode()

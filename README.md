@@ -97,7 +97,7 @@ from blockable import load_css, load_js
 These functions accepts a path to an asset from your root blockable directory and returns a tag for that final asset:
 
 ```
-site_sheet = load_css("assets/css/stylesheet.css")
+site_stylesheet = load_css("assets/css/stylesheet.css")
 layout_js = load_js("layouts/homepage/javascript.js")
 ````
 
@@ -118,6 +118,12 @@ custom_css = save_css("""
 }
 """)
 ```
+
+Blockable also has a load_custom function which accepts a path to any asset from your root blockable directory and returns a URL to that final asset
+```
+right_arrow_src = load_custom("blocks/slider/right_arrow.svg")
+````
+
 
 # Netlify
 
