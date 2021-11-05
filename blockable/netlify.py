@@ -71,9 +71,13 @@ def import_layout(layout, collection_name, layout_type):
     This function imports a layout by importing the fields and
     removing/adding some extra keys to the dictionary
     """
-    # Add layout file/folder
-    layout_file = layout["name"] + ".json"
-    layout[layout_type] = "data/" + collection_name + "/" + layout_file
+    # Add file/folder key
+    if layout_type == "file":  # layout based collection
+        layout_file = layout["name"] + ".json"
+        layout[layout_type] = "data/" + collection_name + "/" + layout_file
+    else:  # data based collection
+        layout[layout_type] = "data/" + collection_name
+        layout["create"] = True
 
     # Import fields
     import_fields(layout)
@@ -81,6 +85,9 @@ def import_layout(layout, collection_name, layout_type):
     # Remove extra field keys
     layout.pop("widget")
     layout.pop("collapsed")
+
+    # Add extra field keys
+    layout["format"] = "json"
 
 
 def import_fields(data):

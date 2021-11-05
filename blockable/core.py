@@ -7,7 +7,7 @@ compile a project folder into a folder of html
 
 # Import modules and set constants
 import os
-from .blockable import TMP_FOLDER, parse_json
+from .blockable import TMP_FOLDER, parse_json, get_template
 from .netlify import CONFIG_FILE_NAME
 
 
@@ -30,16 +30,14 @@ def compile_site():
             path = collection + "/" + data_file
 
             # Get layout
-            if path in data_dict:
+            if path in data_dict:  # layout based collection
                 layout = data_dict[path]
-            elif collection in data_dict:
+            elif collection in data_dict:  # data based collection
                 layout = data_dict[collection]
             else:
                 break
 
             # Get data and html then save
-            from .blockable import get_template
-
             data = parse_json("data/" + path)
             html = str(get_template("layouts/" + layout)(data))
             save(html, data_file[:-5])

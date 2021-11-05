@@ -14,7 +14,6 @@ In our experience many websites that rely on dynamically generated pages do not 
 The two main reasons that we chose not to stick to an existing tool were as follows:
 
 1. We want to focus on reusing blocks of code so that websites can quickly be assembled from pieces of other websites. This saves development time, and encourages the sharing of code.
-
 2. We want to generate the site using a complete scripting language, in this case, Python. This allows the creation of sites to be very simple, or very complex, depending on the needs of the user. This also prevents developers from having to learn particular syntax for a program, and instead learn Python which is very common and reusable.
 
 ### Why python?
@@ -138,7 +137,7 @@ import (the location of the file you'd like to import such as "layouts/homepage"
 name (the unique name of this import)  
 label (the non unique label of this import)  
 
-Folder-based collections (or data-based collections) are created in a similar way except you place the above directory inside the list of collections.   
+Folder-based collections (or data-based collections) are created in a similar way except you replace the "files" key with an import one pointing to the collections layout.
 
 Next place a fields.json file in every template folder. This file should contain a list of each Netlify field for that template and, if necessary, the above
 import dictionary for any extra templates used.   
