@@ -4,6 +4,7 @@ file: blockable.py
 This file contains functions and constants used by the other various modules of
 blockable
 """
+import traceback
 
 # Disable pycache
 import sys
@@ -27,7 +28,8 @@ def get_template(template_path):
     try:
         from index import main as template_function
     except ImportError:
-        print(f"No index.py file found at {template_path}")
+        print(f"Error importing main() from {template_path}/index.py")
+        traceback.print_exc()
         quit()
 
     sys.modules.pop("index")
