@@ -29,18 +29,24 @@ def compile_site():
             # Get path
             path = collection + "/" + data_file
 
-            # Get layout
+            # Get layout and web page
             if path in data_dict:  # layout based collection
                 layout = data_dict[path]
+                web_path = "/" + data_file[:-5]
             elif collection in data_dict:  # data based collection
                 layout = data_dict[collection]
+                web_path = "/" + layout + "/" + data_file[:-5]
+
+                # Ensure layout folder exists
+                if not os.path.isdir(TMP_FOLDER + "/" + layout):
+                    os.mkdir(TMP_FOLDER + "/" + layout)
             else:
                 break
 
             # Get data and html then save
             data = parse_json("data/" + path)
             html = str(get_template("layouts/" + layout)(data))
-            save(html, data_file[:-5])
+            save(html, web_path)
 
     # Move assets
     move_assets()
@@ -117,7 +123,7 @@ def move_assets():
         os.system("cp -r assets/" + asset + " " + TMP_FOLDER)
 
 
-def save(html, page_name):
-    # Save html with given name
-    with open(TMP_FOLDER + "/" + page_name + '.html', 'w') as f:
+def save(html, web_path):
+    # Save html for given web path (should start with "/")
+    with open(TMP_FOLDER + web_path + '.html', 'w') as f:
         f.write(html)
