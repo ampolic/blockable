@@ -6,4 +6,5 @@ setup(name='blockable',
       author='Ampolic Digital Solutions LLC',
       author_email='sam@ampolic.com',
       license='AGPL-3.0',
-      packages=["blockable"])
+      packages=["blockable"],
+      install_requires=['pillow'])

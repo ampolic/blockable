@@ -9,12 +9,74 @@ for creating sites
 import os
 import hashlib
 import base64
+from PIL import Image
 from .blockable import TMP_FOLDER, parse_json
 
 
 def site_data(path):
     # Function to be imported and allow access to site data
     return parse_json("data/" + path + ".json")
+
+
+def load_img(asset_path, **kwargs):
+    """
+    Loads an image from a blockable instance, converts it to webp,
+    scales it to multiple sizes and moves it to the img folder.
+    Returns img tag with nice setting (svg are unchanged)
+    """
+
+    # Remove possible slash at beginning
+    if asset_path[0] == '/':
+        asset_path = asset_path[1:]
+
+    # Get file type
+    dot_index = asset_path.rfind(".")
+    file_type = asset_path[dot_index+1:]
+
+    # Get name based on sha256 hash
+    sha256_hash = hashlib.sha256()
+    with open(asset_path, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    asset_name = sha256_hash.hexdigest()
+
+    # Ensure img folder is present
+    if not os.path.isdir(TMP_FOLDER + "/" + "img"):
+        os.mkdir(TMP_FOLDER + "/" + "img")
+
+    # Don't modify if svg
+    if file_type == "svg":
+        destination = f"/img/{asset_name}.svg"
+        os.system(f"cp {asset_path} {TMP_FOLDER}{destination}")
+    else:
+        # Open image and save as webp
+        destination = f"/img/{asset_name}.webp"
+        with Image.open(asset_path) as image:
+            image.save(f"{TMP_FOLDER}{destination}", format="webp")
+
+    # Start img tag
+    img_tag = f"<img src='{destination}'"
+
+    # Loop though kwords
+    for kword in kwargs.keys():
+
+        # Get value
+        value = str(kwargs[kword])
+
+        # Get key by removing possible _
+        if kword[0] == '_':
+            key = kword[1:]
+        else:
+            key = kword
+
+        # Add arg to tag
+        img_tag += f" {key}='{value}'"
+
+    # Close tag
+    img_tag += ">"
+
+    # Return image tag
+    return img_tag
 
 
 def load_custom(asset_path):

@@ -71,10 +71,10 @@ A __collection__ where each __page__ has a unique __layout__ and unique __conten
 Blockable is still a work in progress (see goals for more information), however in its current state, Blockable is designed
 to work like so:
 
-When creating a website, there should be three primary folders: blocks, layouts, and assets. The assets folder should contain
-a folder for each type of asset you want site wide (css, js, fonts, images, etc.). The blocks and layouts folder mimic each other
-in that each folder should contain a folder for each block/layout you want to create. These folders should then contain an index.py, a 
-stylesheet.css and javascript.js if necessary, and a fields.json (more on this later).   
+When creating a website, there should be three primary folders: blocks, layouts, assets, and static. The assets folder is a folder for
+organizing content to be imported by blockable. The static folder is a folder for assets to be copied to the web root as it during complication.
+The blocks and layouts folder mimic each other in that each folder should contain a folder for each block/layout you want to create. These folders
+should then contain an index.py, a stylesheet.css and javascript.js if necessary, and a fields.json (more on this later).   
 
 index.py should define one main function called main(). This function should accept one variable (which will contain a dictionary of all the data
 requested in fields.json), and it should return a string of the html for that template. When writing your templates, you should make use of the blockable.blocks
@@ -87,7 +87,7 @@ module which contains every block you defined in your blocks folder accessible b
 
 # Asset Functions
 
-To include stylesheets and javascript within your program, developers should import the load_css and load_js functions from blockable:
+To include stylesheets, javascript, and images within your program, developers should import the load_css, load_js, load_img functions from blockable:
 
 ```python
 from blockable import load_css, load_js
@@ -98,11 +98,10 @@ These functions accepts a path to an asset from your root blockable directory an
 ```
 site_stylesheet = load_css("assets/css/stylesheet.css")
 layout_js = load_js("layouts/homepage/javascript.js")
+logo = load_css("assets/images/logo.png")
 ````
 
-Note that the css/js folders are not copied into the destination folder when complied unless you load
-it using the load_css function. In order to keep your site csp compliment, developers should also make 
-use of the save_css function:
+In order to keep your site csp compliment, developers should also make use of the save_css function:
 
 ```python
 from blockable import save_css
