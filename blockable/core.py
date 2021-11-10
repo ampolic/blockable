@@ -10,6 +10,9 @@ import os
 from .blockable import TMP_FOLDER, parse_json, get_template
 from .netlify import CONFIG_FILE_NAME
 
+# Set constant
+STATIC_FOLDER = "static"
+
 
 def compile_site():
     # Get data dict
@@ -108,19 +111,14 @@ def prepare_desination():
 
 
 def move_assets():
-    # Move everything in assets folder
+    # Move everything in static folder
 
     # Get list of assets
-    asset_list = os.listdir("assets")
-
-    # Remove css and js assets
-    for asset in ["css", "js"]:
-        if asset in asset_list:
-            asset_list.remove(asset)
+    asset_list = os.listdir(STATIC_FOLDER)
 
     # Move remaining assets
     for asset in asset_list:
-        os.system("cp -r assets/" + asset + " " + TMP_FOLDER)
+        os.system(f"cp -r {STATIC_FOLDER}/{asset} {TMP_FOLDER}")
 
 
 def save(html, web_path):
