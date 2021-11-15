@@ -38,11 +38,11 @@ def compile_site():
                 web_path = "/" + data_file[:-5]
             elif collection in data_dict:  # data based collection
                 layout = data_dict[collection]
-                web_path = "/" + layout + "/" + data_file[:-5]
+                web_path = "/" + collection + "/" + data_file[:-5]
 
                 # Ensure layout folder exists
-                if not os.path.isdir(TMP_FOLDER + "/" + layout):
-                    os.mkdir(TMP_FOLDER + "/" + layout)
+                if not os.path.isdir(TMP_FOLDER + "/" + collection):
+                    os.mkdir(TMP_FOLDER + "/" + collection)
             else:
                 break
 
