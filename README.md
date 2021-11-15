@@ -141,8 +141,19 @@ Folder-based collections (or data-based collections) are created in a similar wa
 Next place a fields.json file in every template folder. This file should contain a list of each Netlify field for that template and, if necessary, the above
 import dictionary for any extra templates used.   
 
-For settings pages, you can create a new collection and set the files to be imported blocks. Developers can then use the site_data function
-to access any settings data.
+For settings pages, you can create a new collection and set the files to be imported blocks. Developers can then use the get_page function
+to access any page data. Develoeprs can also use the get_pages function to get a list of pages. The function also supports the optional paratmers
+of a sort key which will sort the pages based on a field value for the page and a reverse key which reverse the sort:
+
+```python
+from blockable import get_page, get_pages
+
+blog_list = get_pages("blog", sort="date", reverse=True)
+for blog in blog_list:
+	blog_data = get_page(blog)
+	title = blog_data["title"]
+
+```
 
 Finally, developers can run
 

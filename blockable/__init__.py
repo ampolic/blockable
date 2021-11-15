@@ -13,9 +13,46 @@ from PIL import Image
 from .blockable import TMP_FOLDER, parse_json
 
 
-def site_data(path):
-    # Function to be imported and allow access to site data
-    return parse_json("data/" + path + ".json")
+def get_pages(collection, sort=None, reverse=False):
+    """
+    Function to get a list of every data file in a collection
+    sorted alphabetically by a value in the data file if a sort
+    key is provided. Returns a path to the data file
+    """
+
+    # Get pages and append collection to each
+    pages = os.listdir(f"data/{collection}")
+    pages = [f"{collection}/{page[:-5]}" for page in pages]
+
+    if sort is None:
+        return pages
+    else:
+        return sort_pages(pages, sort, reverse=reverse)
+
+
+def sort_pages(pages, sort, reverse=False):
+    """
+    Function to sort a list of pages based
+    on the value of the sort key within each
+    pages date file
+    """
+
+    # Construction list of tuples with page and sort value
+    page_tuples = [(page, get_page(page)[sort]) for page in pages]
+
+    # Sort list based on second value in tuple
+    page_tuples = sorted(page_tuples, key=lambda x: x[1], reverse=reverse)
+
+    # Return list of first value of tuples
+    return [page_tuple[0] for page_tuple in page_tuples]
+
+
+def get_page(page):
+    """
+    This function returns all the data for a given path.
+    Page should be given as {collection}/{page_name}
+    """
+    return parse_json("data/" + page + ".json")
 
 
 def load_img(asset_path, **kwargs):
