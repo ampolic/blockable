@@ -66,7 +66,8 @@ def get_data_dict():
         netlify_config = parse_json(CONFIG_FILE_NAME)
     except FileNotFoundError:
         pwd = os.getcwd()
-        print(f"No {CONFIG_FILE_NAME} found in {pwd}. Is {pwd} a blockable instance?")
+        print(f"""No {CONFIG_FILE_NAME} found in {pwd}.
+                Is {pwd} a blockable instance?""")
         quit()
 
     # Initialize dict
@@ -122,6 +123,15 @@ def move_assets():
 
 
 def save(html, web_path):
-    # Save html for given web path (should start with "/")
-    with open(TMP_FOLDER + web_path + '.html', 'w') as f:
-        f.write(html)
+    """
+    Save html for given web path (should start with "/") unless a
+    data collection folder is present, then it saves as index
+    """
+
+    # Save as index if a data-based collection folder exists at web path
+    if os.path.isdir(f"{TMP_FOLDER}{web_path}"):
+        with open(f"{TMP_FOLDER}{web_path}/index.html", 'w') as f:
+            f.write(html)
+    else:
+        with open(f"{TMP_FOLDER}{web_path}.html", 'w') as f:
+            f.write(html)
