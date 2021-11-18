@@ -117,9 +117,11 @@ custom_css = save_css("""
 """)
 ```
 
-Blockable also has a load_custom function which accepts a path to any asset from your root blockable directory and returns a URL to that final asset
-```
-right_arrow_src = load_custom("blocks/slider/right_arrow.svg")
+Blockable also has a move_asset function which accepts a path to any asset from your root blockable directory and moves it to the web folder 
+(placing it in an 'asset' folder). It then returns a URL to that final asset
+
+```python
+right_arrow_src = move_asset("blocks/slider/right_arrow.svg")
 ````
 
 

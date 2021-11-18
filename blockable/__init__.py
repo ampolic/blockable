@@ -11,6 +11,7 @@ import hashlib
 import base64
 from PIL import Image
 from .blockable import TMP_FOLDER, parse_json
+from ._utils import remove_slash, get_filetype
 
 
 def get_pages(collection, sort=None, reverse=False):
@@ -55,6 +56,38 @@ def get_page(page):
     return parse_json("data/" + page + ".json")
 
 
+def move_asset(asset_path):
+    """
+    Moves any asset from a blockable instance to an asset
+    folder. Returns path to moved asset
+    """
+
+    # Remove slash and get file type
+    asset_path = remove_slash(asset_path)
+    filetype = get_filetype(asset_path)
+
+    # Get name based on sha256 hash
+    sha256_hash = hashlib.sha256()
+    with open(asset_path, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    asset_name = sha256_hash.hexdigest()
+
+    # Add file type to asset name and get destination
+    asset_name = asset_name + "." + filetype
+    destination = "/" + "asset" + "/" + asset_name
+
+    # Ensure asset folder is present
+    if not os.path.isdir(TMP_FOLDER + "/" + "asset"):
+        os.mkdir(TMP_FOLDER + "/" + "asset")
+
+    # Copy asset to destination
+    os.system("cp " + asset_path + " " + TMP_FOLDER + destination)
+
+    # Return path to image destination
+    return destination
+
+
 def load_img(asset_path, **kwargs):
     """
     Loads an image from a blockable instance, converts it to webp,
@@ -62,13 +95,9 @@ def load_img(asset_path, **kwargs):
     Returns img tag with nice setting (svg are unchanged)
     """
 
-    # Remove possible slash at beginning
-    if asset_path[0] == '/':
-        asset_path = asset_path[1:]
-
-    # Get file type
-    dot_index = asset_path.rfind(".")
-    file_type = asset_path[dot_index+1:]
+    # Remove slash and get file type
+    asset_path = remove_slash(asset_path)
+    filetype = get_filetype(asset_path)
 
     # Get name based on sha256 hash
     sha256_hash = hashlib.sha256()
@@ -82,7 +111,7 @@ def load_img(asset_path, **kwargs):
         os.mkdir(TMP_FOLDER + "/" + "img")
 
     # Don't modify if svg
-    if file_type == "svg":
+    if filetype == "svg":
         destination = f"/img/{asset_name}.svg"
         os.system(f"cp {asset_path} {TMP_FOLDER}{destination}")
     else:
@@ -116,43 +145,14 @@ def load_img(asset_path, **kwargs):
     return img_tag
 
 
-def load_custom(asset_path):
-    """
-    Loads any asset from a blockable instance and moves it to
-    a custom folder. Returns path to moved asset
-    """
-
-    # Get file type
-    dot_index = asset_path.rfind(".")
-    file_type = asset_path[dot_index+1:]
-
-    # Get name based on sha256 hash
-    sha256_hash = hashlib.sha256()
-    with open(asset_path, "rb") as f:
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-    asset_name = sha256_hash.hexdigest()
-
-    # Add file type to asset name and get destination
-    asset_name = asset_name + "." + file_type
-    destination = "/" + "custom" + "/" + asset_name
-
-    # Ensure custom folder is present
-    if not os.path.isdir(TMP_FOLDER + "/" + "custom"):
-        os.mkdir(TMP_FOLDER + "/" + "custom")
-
-    # Copy asset to destination
-    os.system("cp " + asset_path + " " + TMP_FOLDER + destination)
-
-    # Return path to image destination
-    return destination
-
-
 def load_css(asset_path):
     """
     This is a wrapper function for save_css that reads css from a file
     and returns the style tag for the stylesheet
     """
+
+    # Remove possible starting slash
+    asset_path = remove_slash(asset_path)
 
     # Open asset
     css = str()
@@ -167,6 +167,9 @@ def load_js(asset_path):
     This is a wrapper function for save_js that reads js from a file
     and returns the script tag for that script
     """
+
+    # Remove possible starting slash
+    asset_path = remove_slash(asset_path)
 
     # Open asset
     js = str()
