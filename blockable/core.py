@@ -114,6 +114,10 @@ def prepare_desination():
 def move_assets():
     # Move everything in static folder
 
+    # If no static folder, do nothing
+    if not os.path.isdir(STATIC_FOLDER):
+        return
+
     # Get list of assets
     asset_list = os.listdir(STATIC_FOLDER)
 
