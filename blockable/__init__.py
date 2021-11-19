@@ -106,22 +106,44 @@ def load_img(asset_path, **kwargs):
             sha256_hash.update(byte_block)
     asset_name = sha256_hash.hexdigest()
 
+    # Set destination folder
+    destination = f"/img/{asset_name}/"
+
     # Ensure img folder is present
     if not os.path.isdir(TMP_FOLDER + "/" + "img"):
         os.mkdir(TMP_FOLDER + "/" + "img")
 
+    # Ensure hash folder is present
+    if not os.path.isdir(f"{TMP_FOLDER}{destination}"):
+        os.mkdir(f"{TMP_FOLDER}{destination}")
+
     # Don't modify if svg
     if filetype == "svg":
-        destination = f"/img/{asset_name}.svg"
-        os.system(f"cp {asset_path} {TMP_FOLDER}{destination}")
-    else:
-        # Open image and save as webp
-        destination = f"/img/{asset_name}.webp"
-        with Image.open(asset_path) as image:
-            image.save(f"{TMP_FOLDER}{destination}", format="webp")
+        # Move and get sizes
+        os.system(f"cp {asset_path} {TMP_FOLDER}{destination}original.svg")
+        sizes = list()
 
-    # Start img tag
-    img_tag = f"<img src='{destination}'"
+        # Start img tag
+        img_tag = f"<img src='{destination}original.svg'"
+    else:
+        # Move and get sizes
+        sizes = convert_img(asset_path, asset_name)
+
+        # Start img tag
+        img_tag = f"<img src='{destination}original.webp'"
+
+    # Add sizes
+    if sizes is not None:
+        # Start srcset
+        img_tag += " srcset='"
+
+        # Populate srcset
+        for size in sizes:
+            size = str(size)
+            img_tag += f"{destination}{size}.webp {size}w,"
+
+        # End srcset
+        img_tag += "'"
 
     # Loop though kwords
     for kword in kwargs.keys():
@@ -143,6 +165,28 @@ def load_img(asset_path, **kwargs):
 
     # Return image tag
     return img_tag
+
+
+def convert_img(asset_path, asset_name):
+    # Get folder and open image
+    folder = f"/img/{asset_name}/"
+    with Image.open(asset_path) as image:
+
+        # Create list of sizes
+        width = 240
+        sizes = list()
+        while width < image.size[0]:
+            sizes.append(width)
+            width *= 2
+
+        # Save for each width
+        image.save(f"{TMP_FOLDER}{folder}original.webp", format="webp", )
+        for size in reversed(sizes):
+            image.thumbnail((size, image.height))
+            image.save(f"{TMP_FOLDER}{folder}{str(size)}.webp",
+                       format="webp", )
+
+    return sizes
 
 
 def load_css(asset_path):
