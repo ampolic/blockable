@@ -169,7 +169,8 @@ to generate a working config.yml for Netlify to use.
 To compile your site into html, simply run 
 
 ```
-python -m blockable <source> <output>
+python -m blockable [source] [output]
 ```
 
-Where source is your blockable directory. You may also make use of the second optional destination parameter to set where the html will be outputted.
+Where source is the directory of your blockable instance and output is where you would like to send the output. Note that since blockable uses rsync, this output
+can be a non-local destination (i.e. user@website.com:/opt/www/website.com)

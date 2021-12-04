@@ -39,13 +39,13 @@ def create_config():
     parse_config(netlify_config)
 
     # Create admin folder
-    if not os.path.isdir(TMP_FOLDER + "/admin"):
-        os.mkdir(TMP_FOLDER + "/admin")
+    if not os.path.isdir(TMP_FOLDER + "admin"):
+        os.mkdir(TMP_FOLDER + "admin")
 
     # Populate netlify admin folder
-    with open(TMP_FOLDER + "/admin/" + 'index.html', 'w') as f:
+    with open(TMP_FOLDER + "admin/" + 'index.html', 'w') as f:
         f.write(NETLIFY_INDEX)
-    with open(TMP_FOLDER + "/admin/" + 'config.yml', 'w') as f:
+    with open(TMP_FOLDER + "admin/" + 'config.yml', 'w') as f:
         json.dump(netlify_config, f, indent=4)
 
 

@@ -35,14 +35,14 @@ def compile_site():
             # Get layout and web page
             if path in data_dict:  # layout based collection
                 layout = data_dict[path]
-                web_path = "/" + data_file[:-5]
+                web_path = data_file[:-5]
             elif collection in data_dict:  # data based collection
                 layout = data_dict[collection]
-                web_path = "/" + collection + "/" + data_file[:-5]
+                web_path = collection + "/" + data_file[:-5]
 
                 # Ensure layout folder exists
-                if not os.path.isdir(TMP_FOLDER + "/" + collection):
-                    os.mkdir(TMP_FOLDER + "/" + collection)
+                if not os.path.isdir(TMP_FOLDER + collection):
+                    os.mkdir(TMP_FOLDER + collection)
             else:
                 break
 
@@ -102,13 +102,13 @@ def get_data_dict():
 
 def prepare_desination():
 
-    if not os.path.isdir(TMP_FOLDER + "/" + "admin"):
+    if not os.path.isdir(TMP_FOLDER + "admin"):
         # Create new destination folder
-        os.mkdir(TMP_FOLDER + "/" + "admin")
+        os.mkdir(TMP_FOLDER + "admin")
 
     # Create asset directories
     for asset in ["css", "js"]:
-        os.mkdir(TMP_FOLDER + "/" + asset)
+        os.mkdir(TMP_FOLDER + asset)
 
 
 def move_assets():

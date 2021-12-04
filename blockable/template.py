@@ -15,13 +15,13 @@ from .netlify import FIELDS_FILE_NAME as FFN
 def create_template():
     # Create basic blockable instance folders
     for folder in ["assets", "layouts", "blocks", "data"]:
-        os.mkdir(TMP_FOLDER + "/" + folder)
+        os.mkdir(TMP_FOLDER + folder)
     for layout in ["homepage"]:
-        os.mkdir(TMP_FOLDER + "/layouts/" + layout)
+        os.mkdir(TMP_FOLDER + "layouts/" + layout)
     for block in ["nav_bar", "about"]:
-        os.mkdir(TMP_FOLDER + "/blocks/" + block)
+        os.mkdir(TMP_FOLDER + "blocks/" + block)
     for asset in ["css", "js", "images"]:
-        os.mkdir(TMP_FOLDER + "/assets/" + asset)
+        os.mkdir(TMP_FOLDER + "assets/" + asset)
 
     # Create and save json files
     netlify_config = {
@@ -69,10 +69,10 @@ def create_template():
         {"label": "Site Color", "name": "site-color", "widget": "color"}
     ]
 
-    save_json(TMP_FOLDER + "/netlify.json", netlify_config)
-    save_json(TMP_FOLDER + "/layouts/homepage/" + FFN, homepage_fields)
-    save_json(TMP_FOLDER + "/blocks/about/" + FFN, about_fields)
-    save_json(TMP_FOLDER + "/blocks/nav_bar/" + FFN, nav_bar_fields)
+    save_json(TMP_FOLDER + "netlify.json", netlify_config)
+    save_json(TMP_FOLDER + "layouts/homepage/" + FFN, homepage_fields)
+    save_json(TMP_FOLDER + "blocks/about/" + FFN, about_fields)
+    save_json(TMP_FOLDER + "blocks/nav_bar/" + FFN, nav_bar_fields)
 
 
 def save_json(path, data):
