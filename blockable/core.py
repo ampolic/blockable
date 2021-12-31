@@ -43,8 +43,13 @@ def compile_site():
                 # Ensure layout folder exists
                 if not os.path.isdir(TMP_FOLDER + collection):
                     os.mkdir(TMP_FOLDER + collection)
+
+                # Move file if layout based collection has been created first
+                if os.path.exists(f"{TMP_FOLDER}{collection}.html"):
+                    os.system(f"mv {TMP_FOLDER}{collection}.html {TMP_FOLDER}{collection}/index.html")
             else:
                 break
+
 
             # Get data and html then save
             data = parse_json("data/" + path)
