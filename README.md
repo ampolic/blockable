@@ -173,4 +173,5 @@ python -m blockable [source] [output]
 ```
 
 Where source is the directory of your blockable instance and output is where you would like to send the output. Note that since blockable uses rsync, this output
-can be a non-local destination (i.e. user@website.com:/opt/www/website.com)
+can be a non-local destination (i.e. user@website.com:/opt/www/website.com). When compiling for a finished product, you should also enable the "--final (-f)" flag
+which will optimize the site by creating multiple copies of every image for srcset, converting images to webp, etc.

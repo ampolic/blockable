@@ -55,6 +55,12 @@ def interpret_args(args):
     if args["source"] != os.getcwd():
         os.chdir(args["source"])
 
+    # Set final environment variable
+    if args["final"]:
+        os.environ["BLOCKABLE_FINAL"] = str(1)
+    else:
+        os.environ["BLOCKABLE_FINAL"] = str(0)
+
     # Create config/site depending on netlify parameter
     if args["netlify"]:
         create_config()
@@ -100,6 +106,12 @@ def get_args():
             '-p',
             '--port',
             help='Set the port for rsync to use'
+            )
+    parser.add_argument(
+            '-f',
+            '--final',
+            action="store_true",
+            help='Compiles final optimized version of the site'
             )
     parser.add_argument(
             '-i',

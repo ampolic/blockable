@@ -117,20 +117,29 @@ def load_img(asset_path, **kwargs):
     if not os.path.isdir(f"{TMP_FOLDER}{destination}"):
         os.mkdir(f"{TMP_FOLDER}{destination}")
 
-    # Don't modify if svg
-    if filetype == "svg":
-        # Move and get sizes
-        os.system(f"cp {asset_path} {TMP_FOLDER}{destination}original.svg")
-        sizes = list()
-
-        # Start img tag
-        img_tag = f"<img src='{destination}original.svg'"
+    # Check final flag
+    final_flag = int(os.environ["BLOCKABLE_FINAL"])
+    if not final_flag:
+        # Just move original
+        final_name = f"original.{filetype}"
+        os.system(f"cp {asset_path} {TMP_FOLDER}{destination}{final_name}")
+        img_tag = f"<img src='{destination}{final_name}'"
+        sizes = None
     else:
-        # Move and get sizes
-        sizes = convert_img(asset_path, asset_name)
+        # Don't modify if svg
+        if filetype == "svg":
+            # Move and get sizes
+            os.system(f"cp {asset_path} {TMP_FOLDER}{destination}original.svg")
+            sizes = None
 
-        # Start img tag
-        img_tag = f"<img src='{destination}original.webp'"
+            # Start img tag
+            img_tag = f"<img src='{destination}original.svg'"
+        else:
+            # Move and get sizes
+            sizes = convert_img(asset_path, destination, filetype)
+
+            # Start img tag
+            img_tag = f"<img src='{destination}original.webp'"
 
     # Add sizes
     if sizes is not None:
@@ -167,9 +176,13 @@ def load_img(asset_path, **kwargs):
     return img_tag
 
 
-def convert_img(asset_path, asset_name):
+def convert_img(asset_path, destination, filetype):
+    """
+    This function creates multiple copies of an image
+    based on rather than final flag is enabled
+    """
+
     # Get folder and open image
-    folder = f"/img/{asset_name}/"
     with Image.open(asset_path) as image:
 
         # Create list of sizes
@@ -180,10 +193,10 @@ def convert_img(asset_path, asset_name):
             width *= 2
 
         # Save for each width
-        image.save(f"{TMP_FOLDER}{folder}original.webp", format="webp", )
+        image.save(f"{TMP_FOLDER}{destination}original.webp", format="webp")
         for size in reversed(sizes):
             image.thumbnail((size, image.height))
-            image.save(f"{TMP_FOLDER}{folder}{str(size)}.webp",
+            image.save(f"{TMP_FOLDER}{destination}{str(size)}.webp",
                        format="webp", )
 
     return sizes
