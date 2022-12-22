@@ -48,7 +48,7 @@ def compile_site():
                 if os.path.exists(f"{TMP_FOLDER}{collection}.html"):
                     os.system(f"mv {TMP_FOLDER}{collection}.html {TMP_FOLDER}{collection}/index.html")
             else:
-                break
+                continue
 
 
             # Get data and html then save
